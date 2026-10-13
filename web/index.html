@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>FB AutoPost Master - Web Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-logo">⚡</div>
+      <div>
+        <h1>FB AutoPost</h1>
+        <span>Web Mobile Hub</span>
+      </div>
+    </div>
+    <div class="system-status">
+      <span class="status-dot" id="systemStatusDot"></span>
+      <span id="systemStatusText">Sẵn sàng</span>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="container">
+
+    <!-- ================= TAB 1: CHIẾN DỊCH ĐĂNG (CAMPAIGN) ================= -->
+    <section class="tab-pane active" id="tabCampaign">
+      <!-- CẤU HÌNH CHIẾN DỊCH -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 1. Chọn Tài Khoản Đăng</span>
+          <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" id="btnSelectAllProfiles">Chọn tất cả</button>
+        </div>
+        <div class="account-selector-grid" id="campaignAccountGrid">
+          <div style="color: var(--text-dim); font-size: 12px; grid-column: 1/-1;">Đang tải danh sách tài khoản...</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📝 2. Nội Dung Bài Viết</span>
+          <select class="form-select" id="selectPostTemplate" style="width: auto; padding: 4px 8px; font-size: 11px;">
+            <option value="">-- Dùng bài viết mẫu --</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <textarea class="form-control" id="campaignPostContent" placeholder="Nhập nội dung bài viết... Hỗ trợ Spin Syntax {Chào anh em|Hello cả nhà|Chào mọi người}"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <button class="btn btn-secondary" id="btnTestSpin" style="font-size: 11px; padding: 6px 10px;">
+            🎲 Thử bản Spin ngẫu nhiên
+          </button>
+          <span id="spinTestResult" style="font-size: 11px; color: var(--accent-cyan); display: flex; align-items: center;"></span>
+        </div>
+
+        <!-- UPLOAD HÌNH ẢNH / VIDEO TỪ ĐIỆN THOẠI -->
+        <div class="form-group">
+          <label class="form-label">📸 Hình ảnh / Video đính kèm (chọn từ điện thoại):</label>
+          <div class="upload-button-wrapper">
+            <button class="btn btn-secondary" style="font-size: 12px;">
+              📁 Chọn ảnh/video từ máy
+            </button>
+            <input type="file" id="mediaFileInput" multiple accept="image/*,video/*">
+          </div>
+          <span id="uploadStatusText" style="font-size: 11px; color: var(--text-dim); margin-left: 8px;"></span>
+
+          <div class="media-previews-container" id="mediaPreviews">
+            <!-- Xem trước ảnh được upload -->
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🎯 3. Nhóm Mục Tiêu (Group / Feed)</span>
+        </div>
+
+        <div class="form-group">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; margin-bottom: 10px;">
+            <input type="checkbox" id="checkPostToFeed" style="accent-color: var(--accent-cyan);">
+            <span>Đăng lên Trang cá nhân (Feed) của tài khoản</span>
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Chọn nhanh từ nhóm đã tham gia:</label>
+          <div style="max-height: 140px; overflow-y: auto; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 8px;" id="syncedGroupsCheckboxList">
+            <span style="color: var(--text-dim); font-size: 12px;">Chưa có nhóm nào được đồng bộ.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Hoặc dán Link / Group ID (mỗi dòng 1 nhóm):</label>
+          <textarea class="form-control" id="customTargetList" style="min-height: 70px;" placeholder="Ví dụ:&#10;https://facebook.com/groups/12345678&#10;87654321"></textarea>
+        </div>
+
+        <div class="form-group" style="display: flex; gap: 12px;">
+          <div style="flex: 1;">
+            <label class="form-label">Giãn cách từ (giây):</label>
+            <input type="number" class="form-control" id="minDelayInput" value="15" min="5">
+          </div>
+          <div style="flex: 1;">
+            <label class="form-label">Đến (giây):</label>
+            <input type="number" class="form-control" id="maxDelayInput" value="35" min="10">
+          </div>
+        </div>
+      </div>
+
+      <!-- NÚT BẮT ĐẦU / DỪNG -->
+      <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+        <button class="btn btn-primary btn-block btn-lg" id="btnStartCampaign">
+          🚀 BẮT ĐẦU ĐĂNG BÀI
+        </button>
+        <button class="btn btn-danger btn-lg" id="btnStopCampaign" style="display: none; width: 100%;">
+          ⏹️ DỪNG CHIẾN DỊCH
+        </button>
+      </div>
+
+      <!-- TIẾN TRÌNH & TERMINAL LOG REALTIME -->
+      <div class="card" id="campaignProgressCard" style="display: none;">
+        <div class="card-header">
+          <span class="card-title">📊 Tiến Trình Đăng Bài</span>
+          <span id="campaignProgressPercentage" style="font-weight: 700; color: var(--accent-cyan);">0%</span>
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" id="campaignProgressBar"></div>
+        </div>
+        <div id="campaignCurrentStatus" style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+          Đang chuẩn bị...
+        </div>
+      </div>
+
+      <!-- MINI CONSOLE LOG -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">💻 Terminal Hoạt Động Realtime</span>
+          <button class="btn btn-secondary" style="padding: 3px 6px; font-size: 10px;" id="btnClearLogs">Xóa log</button>
+        </div>
+        <div class="terminal-console" id="terminalConsole">
+          <div class="terminal-line info">[System] Kết nối Web Server thành công. Sẵn sàng nhận lệnh đăng bài.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: KHO BÀI VIẾT (POSTS) ================= -->
+    <section class="tab-pane" id="tabPosts">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📝 Quản Lý Bài Viết Mẫu</span>
+          <button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;" id="btnOpenAddPostModal">+ Thêm Mẫu</button>
+        </div>
+        <div id="postTemplateList">
+          <div style="color: var(--text-dim); font-size: 12px;">Đang tải danh sách bài viết...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: TÀI KHOẢN (PROFILES) ================= -->
+    <section class="tab-pane" id="tabProfiles">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">👥 Tài Khoản Facebook Đã Kết Nối</span>
+          <button class="btn btn-primary" style="font-size: 11px; padding: 5px 12px;" id="btnOpenAddAccountModal">
+            + Thêm Tài Khoản
+          </button>
+        </div>
+        <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 12px;">
+          💡 Mỗi tài khoản chạy trong một phiên Chrome cô lập. Bạn có thể bấm <b>"Nhập Cookie"</b> để đăng nhập trực tiếp trên điện thoại, hoặc bấm <b>"Mở Chrome"</b> để đăng nhập trên máy tính.
+        </p>
+        <div id="profilesListContainer">
+          <div style="color: var(--text-dim); font-size: 12px;">Đang tải...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: LỊCH SỬ & BÁO CÁO (HISTORY) ================= -->
+    <section class="tab-pane" id="tabHistory">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📜 Lịch Sử Đăng Bài</span>
+          <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" id="btnClearHistoryBtn">Xóa lịch sử</button>
+        </div>
+        <div id="historyListContainer">
+          <div style="color: var(--text-dim); font-size: 12px;">Đang tải lịch sử...</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAVIGATION FOR MOBILE -->
+  <nav class="bottom-nav">
+    <button class="nav-tab-btn active" data-tab="tabCampaign">
+      <span class="nav-icon">🚀</span>
+      <span>Chiến Dịch</span>
+    </button>
+    <button class="nav-tab-btn" data-tab="tabPosts">
+      <span class="nav-icon">📝</span>
+      <span>Bài Viết</span>
+    </button>
+    <button class="nav-tab-btn" data-tab="tabProfiles">
+      <span class="nav-icon">👥</span>
+      <span>Tài Khoản</span>
+    </button>
+    <button class="nav-tab-btn" data-tab="tabHistory">
+      <span class="nav-icon">📜</span>
+      <span>Lịch Sử</span>
+    </button>
+  </nav>
+
+  <!-- MODAL THÊM & ĐĂNG NHẬP TÀI KHOẢN MỚI -->
+  <div class="modal-overlay" id="addAccountModal">
+    <div class="modal-dialog">
+      <div class="card-header">
+        <span class="card-title" id="addAccountModalTitle">Thêm & Đăng Nhập Tài Khoản Facebook</span>
+        <button class="btn btn-secondary" style="padding: 2px 8px;" id="btnCloseAddAccountModal">&times;</button>
+      </div>
+
+      <input type="hidden" id="loginProfileId">
+
+      <div id="loginStepCredentials">
+        <div class="form-group">
+          <label class="form-label">Tên gợi nhớ cho tài khoản:</label>
+          <input type="text" class="form-control" id="newAccountName" placeholder="Ví dụ: Nick Bán Hàng 1 / Nick Phụ">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email hoặc Số điện thoại Facebook:</label>
+          <input type="text" class="form-control" id="fbLoginUser" placeholder="Nhập email hoặc SĐT đăng nhập Facebook">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mật khẩu Facebook:</label>
+          <input type="password" class="form-control" id="fbLoginPass" placeholder="Nhập mật khẩu Facebook">
+        </div>
+
+        <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 12px; line-height: 1.5;">
+          💡 <b>Cực kỳ tiện lợi:</b> Tool trên máy tính sẽ tự động mở trang Facebook đăng nhập và đồng bộ API. Bạn không cần phải lấy cookie!
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
+          <button class="btn btn-secondary" id="btnCancelAddAccountModal">Hủy</button>
+          <button class="btn btn-primary" id="btnSubmitAddAccount">
+            🚀 Đăng Nhập Tự Động
+          </button>
+        </div>
+
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-color); text-align: center;">
+          <a href="javascript:void(0)" id="toggleAdvancedCookie" style="font-size: 11px; color: var(--text-muted); text-decoration: none;">
+            + Hoặc bạn đã có sẵn chuỗi Cookie? Bấm vào đây
+          </a>
+          <div id="advancedCookieBox" style="display: none; margin-top: 8px; text-align: left;">
+            <textarea class="form-control" id="newAccountCookie" style="min-height: 70px;" placeholder="Dán cookie c_user=...; xs=... nếu có sẵn"></textarea>
+            <button class="btn btn-secondary btn-block" style="margin-top: 6px; font-size: 11px;" id="btnSubmitCookieOnly">
+              Nạp Cookie Này
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- BƯỚC NHẬP MÃ XÁC THỰC 2 LỚP (2FA) NẾU FACEBOOK YÊU CẦU -->
+      <div id="loginStep2FA" style="display: none;">
+        <div style="padding: 10px; background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); border-radius: var(--radius-sm); margin-bottom: 14px;">
+          <div style="font-weight: 600; font-size: 13px; color: var(--accent-amber); margin-bottom: 4px;">⚠️ Yêu cầu mã xác thực 2 lớp (2FA)</div>
+          <div style="font-size: 11.5px; color: #cbd5e1;">Facebook vừa gửi mã 6 số về SMS hoặc ứng dụng Google/Facebook Authenticator của bạn.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nhập mã xác thực (6 số):</label>
+          <input type="text" class="form-control" id="fbLogin2FACode" placeholder="Ví dụ: 123456" maxlength="8" style="font-size: 18px; letter-spacing: 4px; text-align: center; font-weight: 700;">
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
+          <button class="btn btn-secondary" id="btnBackToCredentials">Quay lại</button>
+          <button class="btn btn-primary" id="btnSubmit2FA">
+            ✓ Xác Nhận Mã 2FA
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL THÊM / SỬA BÀI VIẾT -->
+  <div class="modal-overlay" id="postModal">
+    <div class="modal-dialog">
+      <div class="card-header">
+        <span class="card-title" id="postModalTitle">Tạo Mẫu Bài Viết Mới</span>
+        <button class="btn btn-secondary" style="padding: 2px 8px;" id="btnClosePostModal">&times;</button>
+      </div>
+      <input type="hidden" id="editPostId">
+      <div class="form-group">
+        <label class="form-label">Tiêu đề gợi nhớ:</label>
+        <input type="text" class="form-control" id="modalPostTitle" placeholder="Ví dụ: Bán hàng mùa hè / Tuyển dụng CTV">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nội dung bài viết (hỗ trợ Spin {A|B}):</label>
+        <textarea class="form-control" id="modalPostContent" style="min-height: 120px;" placeholder="Soạn nội dung..."></textarea>
+      </div>
+      <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;">
+        <button class="btn btn-secondary" id="btnCancelPostModal">Hủy</button>
+        <button class="btn btn-primary" id="btnSavePostModal">Lưu Bài Viết</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

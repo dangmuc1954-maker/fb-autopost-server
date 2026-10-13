@@ -1,0 +1,176 @@
+{
+  "profiles": [
+    {
+      "id": "prof_1791910286130_auy4c",
+      "name": "Nick Facebook 1",
+      "uid": "",
+      "avatar": "",
+      "proxy": "",
+      "note": "",
+      "status": "ready",
+      "isLoggedIn": false,
+      "groups": [],
+      "lastSynced": null,
+      "createdAt": "2026-10-13T16:51:26.130Z"
+    }
+  ],
+  "posts": [
+    {
+      "id": "post_sample_01",
+      "title": "Mẫu bài viết KOC & Marketing (Có Spin Syntax)",
+      "content": "{Chào anh em|Hello cả nhà|Chào mọi người} trong nhóm! 👋\n\n{Hôm nay mình muốn chia sẻ|Góc chia sẻ ngày mới|Gửi tặng anh em} kinh nghiệm xây dựng hệ thống quản lý nội dung đa kênh tự động.\n\n👉 {Chi tiết kinh nghiệm:|Một số lưu ý quan trọng:|Điểm mấu chốt:}\n1. {Lên lịch đều đặn|Duy trì nhịp đăng bài hàng ngày}\n2. {Tối ưu hình ảnh bắt mắt|Nội dung ngắn gọn, đánh đúng tâm lý}\n3. {Tương tác nhiệt tình dưới phần bình luận|Chăm sóc khách hàng chu đáo}\n\nChúc {anh em|cả nhà|mọi người} một ngày làm việc {năng lượng|hiệu quả|thật nhiều đơn hàng} nhé! 🚀",
+      "media": [],
+      "createdAt": "2026-10-13T05:30:00.000Z",
+      "updatedAt": "2026-10-13T05:53:51.147Z"
+    },
+    {
+      "id": "post_1791876741847",
+      "title": "Bài viết chưa đặt tên",
+      "content": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "media": [
+        "C:\\Users\\admin\\Downloads\\intro_studio_banner.png"
+      ],
+      "createdAt": "2026-10-13T07:32:21.847Z"
+    }
+  ],
+  "history": [
+    {
+      "id": "hist_1791909520731_ul5c",
+      "time": "23:38:40 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "CỘNG ĐỒNG LÀM VIDEO BẰNG AI 🎥",
+      "targetUrl": "https://www.facebook.com/groups/1450430758632402",
+      "targetAvatar": "",
+      "postTitle": "Bài viết",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "error",
+      "message": "Nút Đăng bài không thể bấm hoặc bị vô hiệu hóa.",
+      "postUrl": "",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Lỗi đăng"
+    },
+    {
+      "id": "hist_1791909483040_749m",
+      "time": "23:38:03 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "Làm Video Bằng AI ✅",
+      "targetUrl": "https://www.facebook.com/groups/1335150193545289",
+      "targetAvatar": "",
+      "postTitle": "Bài viết",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "error",
+      "message": "Nút Đăng bài không thể bấm hoặc bị vô hiệu hóa.",
+      "postUrl": "",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Lỗi đăng"
+    },
+    {
+      "id": "hist_1791900353445_xvlo",
+      "time": "21:05:53 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "CỘNG ĐỒNG LÀM VIDEO BẰNG AI 🎥",
+      "targetUrl": "https://www.facebook.com/groups/1450430758632402",
+      "targetAvatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/832247104_122135554815172214_5903620346301137667_n.png?stp=c415.0.906.906a_cp0_dst-png&cstp=mx906x906&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=eSy3u7OW5WEQ7kNvwHsPvYK&_nc_oc=Ado4kT4Tpvkj0weKJFFwOUZAlmdlhb7tRqmyzQsHflFv1sITfF3ToMCIbReY8q4JTXeiTCPrbhkQKjI_coHhLTIg&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=fxknAX3omSlwvhW_twzE6Q&_nc_ss=7b2a8&oh=00_AQMP-zt82JsZXDoBvtQ1el3BTdBWoVSkyTM6atCZYXCkXA&oe=6AD3CA12",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "pending_approval",
+      "message": "Bài viết đã gửi và đang chờ Quản trị viên nhóm phê duyệt.",
+      "postUrl": "https://www.facebook.com/groups/1450430758632402",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Chờ duyệt"
+    },
+    {
+      "id": "hist_1791899954518_hs2v",
+      "time": "20:59:14 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "Edit Capcut - Việc Làm Video Editor Tiktok",
+      "targetUrl": "https://www.facebook.com/groups/1181391356304247",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "pending_approval",
+      "message": "Bài viết đã gửi và đang chờ Quản trị viên nhóm phê duyệt.",
+      "postUrl": "https://www.facebook.com/groups/1181391356304247",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Chờ duyệt"
+    },
+    {
+      "id": "hist_1791899807535_c3ct",
+      "time": "20:56:47 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "Affiliate TikTokShop - Kiếm tiền AFF với TikTok Shop",
+      "targetUrl": "https://www.facebook.com/groups/tiktok.uni",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "error",
+      "message": "Nút Đăng bài không thể bấm hoặc bị vô hiệu hóa.",
+      "postUrl": "",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Lỗi đăng"
+    },
+    {
+      "id": "hist_1791899764434_g369",
+      "time": "20:56:04 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "LÀM VIDEO BẰNG AI ✅",
+      "targetUrl": "https://www.facebook.com/groups/Phununews",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "error",
+      "message": "Không tìm thấy khung soạn bài (Có thể bạn chưa được duyệt vào nhóm kín).",
+      "postUrl": "",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Lỗi đăng"
+    },
+    {
+      "id": "hist_1791899732819_nyv2",
+      "time": "20:55:32 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "CỘNG ĐỒNG LÀM VIDEO BẰNG AI 🎥",
+      "targetUrl": "https://www.facebook.com/groups/1450430758632402",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "pending_approval",
+      "message": "Bài viết đã gửi và đang chờ Quản trị viên nhóm phê duyệt.",
+      "postUrl": "https://www.facebook.com/groups/1450430758632402",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Chờ duyệt"
+    },
+    {
+      "id": "hist_1791899154640_hxhm",
+      "time": "20:45:54 13/10/2026",
+      "profileId": "prof_1791878090267_pz2o8",
+      "profileName": "Linh Phương Võ",
+      "targetName": "Làm Video Bằng AI ✅",
+      "targetUrl": "https://www.facebook.com/groups/1335150193545289",
+      "postTitle": "Bài viết chưa đặt tên",
+      "postContent": "Tool tạo video ai hàng loạt tích hợp 3 nền tảng ai hot VEO3, GROK  MUSE \nSẵn cơ chế ghép video , chụp ảnh frame để đồng nhất nhân vật \nHệ thống workflow \nSưởng sản xuất ai với kịch bản tự động \nGiá rất rẻ chỉ từ 100k \nweb giới thiệu và tải tool :https://vercelserver-eight.vercel.app/",
+      "status": "success",
+      "message": "Bài viết đã được đăng ngầm thành công lên nhóm.",
+      "postUrl": "https://www.facebook.com/groups/1335150193545289",
+      "likesCount": 0,
+      "commentsCount": 0,
+      "cmtStatus": "Đã đăng"
+    }
+  ],
+  "settings": {
+    "chromePath": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+    "minDelay": 15,
+    "maxDelay": 35,
+    "headless": true,
+    "maxThreads": 1
+  }
+}

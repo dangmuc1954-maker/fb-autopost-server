@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FB AutoPost Master - Browser Hub Quản Lý Đăng Bài</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">⚡</div>
+        <div class="brand-text">
+          <h2>FB AutoPost</h2>
+          <span>HUB v1.0</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">WORKSPACE</div>
+        <div class="nav-item active" data-tab="tab-hub" id="navHub">
+          <span class="nav-icon">🌐</span>
+          <span>Browser Hub</span>
+        </div>
+        <div class="nav-item" data-tab="tab-campaign" id="navCampaign">
+          <span class="nav-icon">🚀</span>
+          <span>Chiến Dịch Đăng</span>
+        </div>
+        <div class="nav-item" data-tab="tab-content" id="navContent">
+          <span class="nav-icon">📝</span>
+          <span>Kho Bài Viết</span>
+        </div>
+
+        <div class="nav-section-title" style="margin-top: 10px;">SYSTEM</div>
+        <div class="nav-item" data-tab="tab-logs" id="navLogs">
+          <span class="nav-icon">📜</span>
+          <span>Nhật Ký & Báo Cáo</span>
+        </div>
+        <div class="nav-item" data-tab="tab-settings" id="navSettings">
+          <span class="nav-icon">⚙️</span>
+          <span>Cài Đặt</span>
+        </div>
+      </nav>
+
+      <div class="sidebar-status">
+        <div class="status-badge-container">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="status-dot" id="systemStatusDot"></span>
+            <span id="systemStatusText" style="color: var(--text-muted); font-size: 11px;">Sẵn sàng</span>
+          </div>
+          <span id="activeBrowserCount" style="color: var(--accent-cyan); font-weight: 600; font-size: 11px;">0 Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="page-title">
+          <h1 id="pageTitleText">Quản lý Tài khoản Trình duyệt (Browser Hub)</h1>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <button class="btn btn-secondary btn-sm" id="btnWebMobileLink" title="Bấm để sao chép link Web cho điện thoại" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(6, 182, 212, 0.1); color: var(--accent-cyan);">
+            <span>📱 Web Điện Thoại: <b id="topbarWebUrl">http://localhost:3000</b></span>
+          </button>
+          <button class="btn btn-secondary btn-sm" id="btnQuickTerminal">
+            <span>💻 Terminal</span>
+          </button>
+          <button class="btn btn-primary btn-sm" id="btnTopAddAccount">
+            <span>+ Thêm Tài Khoản</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB 1: BROWSER HUB -->
+      <section class="tab-content active" id="tab-hub">
+        <!-- PLATFORM RIBBON: HORIZONTAL ACCOUNT CARDS -->
+        <div class="platform-ribbon-container">
+          <div class="ribbon-header">
+            <h3>
+              <span>Danh Sách Tài Khoản Trình Duyệt</span>
+              <span id="profileCountBadge" style="font-size: 11px; color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); padding: 1px 7px; border-radius: 8px;">0 Tài khoản</span>
+            </h3>
+          </div>
+          <div class="platform-cards-row" id="platformRibbon">
+            <!-- Platform cards rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- SPLIT VIEW: CENTER INTERACTIVE PANEL & RIGHT INSPECTOR -->
+        <div class="hub-split-view">
+          <!-- CENTER PANEL -->
+          <div class="hub-main-panel">
+            <div class="hub-panel-header">
+              <h4>
+                <span>🌐 Phiên Trình Duyệt:</span>
+                <span id="currentAccountHeaderName" style="color: var(--accent-cyan);">Chưa chọn tài khoản</span>
+                <span id="currentAccountHeaderStatus" class="status-pill not-logged">Chưa kết nối</span>
+              </h4>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-cyan btn-sm" id="btnHubSyncGroups">
+                  <span>⚡ Quét Nhóm Đã Tham Gia</span>
+                </button>
+                <button class="btn btn-primary btn-sm" id="btnHubOpenBrowser">
+                  <span>Mở Trình Duyệt</span>
+                </button>
+                <button class="btn btn-secondary btn-sm" id="btnHubCloseBrowser" style="display: none;">
+                  <span>Đóng Trình Duyệt</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="hub-tabs-nav">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <button class="hub-tab-btn active" data-subtab="subtab-groups">👥 Nhóm Đã Tham Gia (<span id="activeGroupCountText">0</span>)</button>
+                <button class="hub-tab-btn" data-subtab="subtab-api">🔑 Cấu Hình & API Session</button>
+              </div>
+              <div class="view-mode-toggle">
+                <button class="view-toggle-btn active" id="btnViewModeCards" title="Xem dạng thẻ">🔲 Thẻ</button>
+                <button class="view-toggle-btn" id="btnViewModeTable" title="Xem dạng bảng">📑 Bảng</button>
+              </div>
+            </div>
+
+            <div class="hub-tab-body" id="subtab-groups">
+              <div class="groups-toolbar">
+                <div class="search-box">
+                  <input type="text" id="inputSearchGroups" placeholder="Tìm kiếm nhóm theo tên hoặc ID nhóm...">
+                </div>
+                <div style="display: flex; gap: 6px;">
+                  <button class="btn btn-secondary btn-sm" id="btnSelectAllHubGroups">Chọn Tất Cả</button>
+                  <button class="btn btn-secondary btn-sm" id="btnDeselectAllHubGroups">Bỏ Chọn</button>
+                  <button class="btn btn-primary btn-sm" id="btnSendGroupsToCampaign">➡️ Đưa Vào Chiến Dịch</button>
+                </div>
+              </div>
+
+              <!-- CHẾ ĐỘ 1: XEM DẠNG THẺ (CARDS GRID) -->
+              <div id="hubGroupsCardsContainer" class="groups-cards-grid" style="flex: 1;">
+                <!-- Rendered dynamically -->
+              </div>
+
+              <!-- CHẾ ĐỘ 2: XEM DẠNG BẢNG (TABLE) -->
+              <div id="hubGroupsTableContainer" class="table-responsive" style="flex: 1; display: none;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 36px;"><input type="checkbox" id="cbHubCheckAll"></th>
+                      <th style="width: 44px;">Ảnh</th>
+                      <th>Tên Hội Nhóm</th>
+                      <th>Quyền Riêng Tư</th>
+                      <th>Thành Viên</th>
+                      <th style="width: 80px;">Thao Tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="hubGroupsTableBody">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="hub-tab-body" id="subtab-api" style="display: none;">
+              <div class="glass-card" style="margin-bottom: 12px; background: rgba(0,0,0,0.2);">
+                <h4 style="font-size: 13px; color: #fff; margin-bottom: 6px;">Trích Xuất API Session & Cookie</h4>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+                  Sau khi đăng nhập trên trình duyệt, bấm nút bên dưới để tool tự động trích xuất Avatar, UID, Cookie và Session của tài khoản.
+                </p>
+                <button class="btn btn-primary" id="btnHubFetchApi">
+                  <span>🔄 Lấy API / Đồng Bộ Session</span>
+                </button>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">UID Facebook:</label>
+                <input type="text" class="form-control" id="hubDetailUid" readonly placeholder="Chưa có UID">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Proxy gán riêng:</label>
+                <input type="text" class="form-control" id="hubDetailProxy" placeholder="http://ip:port hoặc để trống">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Ghi chú tài khoản:</label>
+                <input type="text" class="form-control" id="hubDetailNote" placeholder="Ghi chú...">
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-success btn-sm" id="btnHubSaveDetails">Lưu Thay Đổi</button>
+                <button class="btn btn-danger btn-sm" id="btnHubDeleteAccount">Xóa Tài Khoản</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT INSPECTOR PANEL (HERO ACCOUNT) -->
+          <div class="hub-inspector-panel">
+            <div class="inspector-hero-card">
+              <div class="inspector-hero-avatar-wrapper">
+                <img id="inspectorHeroAvatar" class="inspector-hero-avatar" src="https://graph.facebook.com/4/picture?type=large" alt="Avatar">
+                <div class="inspector-hero-verified" title="Tài khoản đã xác thực">✓</div>
+              </div>
+              <div>
+                <h3 class="inspector-hero-name" id="inspectorName">Chọn tài khoản</h3>
+                <div class="inspector-hero-uid-badge" id="inspectorUidBadge">UID: --</div>
+              </div>
+              <div style="display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 2px;">
+                <span class="status-pill logged-in" id="inspectorStatusPill">Sẵn sàng</span>
+                <span class="status-pill" style="background: rgba(59,130,246,0.15); color: #60a5fa;" id="inspectorProxyBadge">IP Máy Tính</span>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn btn-cyan btn-full" id="btnInspectorSync">
+                <span>⚡ Quét Nhóm Đã Tham Gia</span>
+              </button>
+              <button class="btn btn-secondary btn-full" id="btnInspectorOpenFB">
+                <span>🌐 Mở Facebook Trực Tiếp</span>
+              </button>
+            </div>
+
+            <div class="stats-grid-2x2">
+              <div class="stat-box">
+                <span class="stat-box-title">Nhóm đã quét</span>
+                <span class="stat-box-value" id="statJoinedGroupsCount">0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-title">Trạng thái</span>
+                <span class="stat-box-value" id="statAccountReadyText" style="font-size: 13px; color: #34d399;">Sẵn sàng</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-title">Đã đăng</span>
+                <span class="stat-box-value" id="statPostedCount">0 bài</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-title">Tỉ lệ thành công</span>
+                <span class="stat-box-value" style="color: #38bdf8;">100%</span>
+              </div>
+            </div>
+
+            <div class="info-banner" style="margin-bottom: 0; padding: 10px 12px;">
+              <div class="info-banner-icon" style="font-size: 16px;">💡</div>
+              <div class="info-banner-content">
+                <h4 style="font-size: 11px;">Mẹo Sử Dụng</h4>
+                <p style="font-size: 11px;">Mỗi nick Facebook được lưu 1 phiên riêng biệt. Bấm quét nhóm 1 lần, danh sách nhóm sẽ lưu vĩnh viễn để anh tick chọn đăng bài bất cứ lúc nào!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CHIẾN DỊCH ĐĂNG BÀI (CAMPAIGN RUNNER) -->
+      <section class="tab-content" id="tab-campaign">
+        <div class="glass-card" style="margin-bottom: 16px; padding: 14px 18px;">
+          <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <h3 style="font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 2px;">Cấu Hình & Khởi Chạy Đăng Bài Hàng Loạt</h3>
+              <p style="font-size: 12px; color: var(--text-muted);">Tick chọn các nhóm từ danh sách nhóm đã quét, cài đặt giãn cách giây và bấm Đăng ngay.</p>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-danger btn-lg" id="btnStopCampaign" style="display: none;">
+                <span>🛑 Dừng Chiến Dịch</span>
+              </button>
+              <button class="btn btn-primary btn-lg" id="btnStartCampaign">
+                <span>🚀 Bắt Đầu Đăng Hàng Loạt</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- PROGRESS BAR -->
+          <div id="campaignProgressSection" style="margin-top: 14px; display: none;">
+            <div style="display: flex; justify-content: space-between; font-size: 12px; color: #fff; margin-bottom: 4px;">
+              <span id="campaignProgressText">Đang xử lý: 0/0</span>
+              <span id="campaignProgressPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="campaignProgressBar"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3" style="grid-template-columns: 280px 1fr 340px;">
+          <!-- 1. CHỌN TÀI KHOẢN & BÀI VIẾT -->
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="glass-card" style="margin-bottom: 0;">
+              <div class="section-header" style="margin-bottom: 10px;">
+                <h3 style="font-size: 13px;">1. Chọn Tài Khoản</h3>
+                <button class="btn btn-secondary btn-sm" id="btnSelectAllCampaignProfiles">Tất cả</button>
+              </div>
+              <div class="profile-select-list" id="campaignProfileList" style="max-height: 180px;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <div class="glass-card" style="margin-bottom: 0; flex: 1;">
+              <div class="section-header" style="margin-bottom: 10px;">
+                <h3 style="font-size: 13px;">2. Chọn Bài Viết</h3>
+              </div>
+              <div class="form-group">
+                <select class="form-control" id="campaignSelectPost">
+                  <option value="">-- Chọn bài viết từ kho --</option>
+                </select>
+              </div>
+              <div id="campaignPostPreview" style="background: rgba(0,0,0,0.25); padding: 10px; border-radius: var(--radius-sm); font-size: 11.5px; color: var(--text-muted); max-height: 150px; overflow-y: auto;">
+                Chưa chọn bài viết.
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. TICK CHỌN NHÓM ĐÃ THAM GIA -->
+          <div class="glass-card" style="margin-bottom: 0; display: flex; flex-direction: column;">
+            <div class="section-header" style="margin-bottom: 10px;">
+              <h3 style="font-size: 13px;">
+                <span>3. Danh Sách Nhóm Để Đăng</span>
+                <span id="campaignSelectedGroupsBadge" style="font-size: 11px; color: var(--accent-cyan); background: rgba(6, 182, 212, 0.15); padding: 1px 7px; border-radius: 8px;">Đã chọn 0 nhóm</span>
+              </h3>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary btn-sm" id="btnCampaignSelectAllGroups">Chọn Tất Cả</button>
+                <button class="btn btn-secondary btn-sm" id="btnCampaignClearGroups">Bỏ Chọn</button>
+              </div>
+            </div>
+
+            <div class="search-box" style="margin-bottom: 10px;">
+              <input type="text" id="campaignGroupSearch" placeholder="Lọc nhóm theo tên...">
+            </div>
+
+            <div class="table-responsive" style="flex: 1; max-height: 380px; overflow-y: auto; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 32px;"><input type="checkbox" id="cbCampaignCheckAll"></th>
+                    <th style="width: 42px;">Ảnh</th>
+                    <th>Tên Nhóm</th>
+                    <th>Thành Viên</th>
+                    <th>Thuộc Nick</th>
+                    <th style="width: 130px; text-align: center;">Trạng Thái</th>
+                  </tr>
+                </thead>
+                <tbody id="campaignGroupsTableBody">
+                  <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-dim); padding: 30px;">
+                      Hãy quét nhóm ở Browser Hub để các nhóm hiện ra ở đây nhé!
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- TÙY CHỌN NHẬP THÊM LINK NHÓM NGOÀI -->
+            <div style="margin-top: 10px;">
+              <span style="font-size: 11px; color: var(--text-muted); cursor: pointer;" id="toggleManualTargets">+ Hoặc nhập thêm link Group thủ công (mỗi dòng 1 link)</span>
+              <textarea class="form-control" id="campaignManualTargets" rows="2" style="display: none; margin-top: 6px; font-size: 11px;" placeholder="https://www.facebook.com/groups/12345678 (mỗi dòng 1 nhóm)"></textarea>
+            </div>
+          </div>
+
+          <!-- 3. CÀI ĐẶT GIÃN CÁCH GIÂY & AN TOÀN -->
+          <div class="glass-card" style="margin-bottom: 0;">
+            <div class="section-header" style="margin-bottom: 10px;">
+              <h3 style="font-size: 13px;">4. Cài Đặt Giãn Cách Đăng</h3>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mỗi nhóm đăng cách nhau bao nhiêu giây?</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="number" class="form-control" id="campaignMinDelay" value="15" min="5" style="text-align: center;">
+                <span style="color: var(--text-dim); font-size: 12px;">đến</span>
+                <input type="number" class="form-control" id="campaignMaxDelay" value="30" min="10" style="text-align: center;">
+                <span style="color: var(--text-dim); font-size: 12px;">giây</span>
+              </div>
+              <p style="font-size: 11px; color: var(--text-dim); margin-top: 4px;">Hệ thống sẽ lấy ngẫu nhiên trong khoảng này để chống spam Facebook.</p>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="campaignPostFeed" style="width: 15px; height: 15px; accent-color: var(--accent-cyan);">
+              <label for="campaignPostFeed" style="font-size: 12px; color: var(--text-main); cursor: pointer;">Đăng kèm lên Trang cá nhân (Feed)</label>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 8px; background: rgba(6, 182, 212, 0.08); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(6, 182, 212, 0.25);">
+              <input type="checkbox" id="campaignHeadless" checked style="width: 16px; height: 16px; accent-color: var(--accent-cyan);">
+              <label for="campaignHeadless" style="font-size: 12px; color: #38bdf8; font-weight: 600; cursor: pointer;">⚡ Chạy ngầm 100% (Ẩn toàn bộ Chrome, hiển thị trên bảng Tool)</label>
+            </div>
+
+            <div class="info-banner" style="margin-bottom: 0; padding: 10px 12px;">
+              <div class="info-banner-icon" style="font-size: 15px;">🛡️</div>
+              <div class="info-banner-content">
+                <h4 style="font-size: 11px;">Chống Khóa Nick</h4>
+                <p style="font-size: 11px;">Khuyên dùng: Nên để khoảng cách từ 30 - 60 giây và bật Spin syntax để mỗi bài đăng vào nhóm là duy nhất.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: KHO BÀI VIẾT (CONTENT STUDIO) -->
+      <section class="tab-content" id="tab-content">
+        <div class="content-studio-layout">
+          <div class="posts-sidebar">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <h4 style="font-size: 13px; font-weight: 600; color: #fff;">Kho Bài Đã Lưu</h4>
+              <button class="btn btn-primary btn-sm" id="btnNewPost">+ Mới</button>
+            </div>
+            <div class="posts-list" id="postsList">
+              <!-- Post items rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="editor-area">
+            <input type="hidden" id="currentPostId" value="">
+            <div class="form-group">
+              <label class="form-label">Tiêu đề bài viết (quản lý nội bộ)</label>
+              <input type="text" class="form-control" id="postTitle" placeholder="Ví dụ: Giới thiệu dịch vụ KOC tháng 10...">
+            </div>
+
+            <div style="background: rgba(6, 182, 212, 0.08); border: 1px dashed rgba(6, 182, 212, 0.3); padding: 8px 12px; border-radius: var(--radius-md); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+              <div style="font-size: 11.5px; color: var(--accent-cyan);">
+                ✨ Hỗ trợ Spin Syntax: <code>{Chào anh em|Hello cả nhà|Chào mọi người}</code>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button class="btn btn-secondary btn-sm" id="btnInsertSpin">+ Mẫu {A|B}</button>
+                <button class="btn btn-secondary btn-sm" id="btnPreviewSpin">🎲 Test Spin</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="flex: 1; display: flex; flex-direction: column;">
+              <label class="form-label">Nội dung bài viết Facebook</label>
+              <textarea class="form-control" id="postContent" style="flex: 1; min-height: 160px;" placeholder="Nhập nội dung bài viết bạn muốn đăng lên Group hoặc Fanpage..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <label class="form-label" style="margin: 0;">Hình ảnh / Video đính kèm</label>
+                <button class="btn btn-secondary btn-sm" id="btnSelectMedia">📷 + Thêm Ảnh/Video</button>
+              </div>
+              <div class="media-preview-container" id="mediaContainer"></div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px;">
+              <button class="btn btn-danger btn-sm" id="btnDeletePost" style="display: none;">Xóa Bài</button>
+              <button class="btn btn-success" id="btnSavePost">💾 Lưu Bài Viết</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: NHẬT KÝ & BÁO CÁO (LOGS & ENGAGEMENT HISTORY) -->
+      <section class="tab-content" id="tab-logs">
+        <div class="glass-card" style="padding: 0; overflow: hidden; margin-bottom: 18px;">
+          <div class="terminal-header">
+            <span style="font-size: 11px; font-weight: 600; color: #94a3b8; font-family: monospace;">REALTIME AUTOMATION TERMINAL</span>
+            <button class="btn btn-secondary btn-sm" id="btnClearTerminal">Xóa màn hình</button>
+          </div>
+          <div class="terminal-body" id="terminalBody">
+            <div class="log-line">
+              <span class="log-time">[Hệ thống]</span>
+              <span class="log-info">FB AutoPost Browser Hub đã sẵn sàng. Chúc anh chiến dịch thành công rực rỡ!</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-card">
+          <div class="section-header">
+            <h3>📊 Lịch Sử Đăng Bài & Tương Tác (Like / Comment)</h3>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-cyan btn-sm" id="btnRefreshAllEngagement">🔄 Cập Nhật Tương Tác Tất Cả</button>
+              <button class="btn btn-secondary btn-sm" id="btnClearHistory">Xóa Lịch Sử</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Tài khoản</th>
+                  <th>Nhóm đã đăng</th>
+                  <th>Bài viết</th>
+                  <th>Trạng thái</th>
+                  <th style="text-align: center;">Tương tác (Like)</th>
+                  <th style="text-align: center;">Bình luận (Cmt)</th>
+                  <th>Trạng thái Cmt</th>
+                  <th style="text-align: center;">Hành động</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: CÀI ĐẶT (SETTINGS) -->
+      <section class="tab-content" id="tab-settings">
+        <div class="glass-card" style="max-width: 600px;">
+          <div class="section-header">
+            <h3>⚙️ Cấu Hình Hệ Thống</h3>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Đường dẫn Google Chrome (chrome.exe):</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" class="form-control" id="settingChromePath" readonly>
+              <button class="btn btn-secondary" id="btnSelectChrome">Chọn tệp</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Giãn cách mặc định (giây):</label>
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <input type="number" class="form-control" id="settingMinDelay" value="30">
+              <span>đến</span>
+              <input type="number" class="form-control" id="settingMaxDelay" value="60">
+            </div>
+          </div>
+          <div style="margin-top: 16px;">
+            <button class="btn btn-primary" id="btnSaveSettings">💾 Lưu Cấu Hình</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL: THÊM TÀI KHOẢN -->
+  <div class="modal-overlay" id="modalAddProfile">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>+ Thêm Tài Khoản Facebook Mới</h3>
+        <button class="modal-close" id="btnCloseAddProfileModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tên gọi / Tên Nick Facebook:</label>
+          <input type="text" class="form-control" id="inputProfileName" placeholder="Ví dụ: Nick Bán Hàng 01, Dàn Seeding 02...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Proxy riêng (nếu có, định dạng: http://ip:port):</label>
+          <input type="text" class="form-control" id="inputProfileProxy" placeholder="Để trống nếu dùng mạng máy tính bình thường">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ghi chú:</label>
+          <input type="text" class="form-control" id="inputProfileNote" placeholder="Ghi chú thêm...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnCancelAddProfile">Hủy</button>
+        <button class="btn btn-primary" id="btnSubmitAddProfile">Tạo Profile Trình Duyệt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: TEST BẢN SPIN -->
+  <div class="modal-overlay" id="modalSpinPreview">
+    <div class="modal-box" style="width: 520px;">
+      <div class="modal-header">
+        <h3>🎲 Xem Trước Bản Spin Ngẫu Nhiên</h3>
+        <button class="modal-close" id="btnCloseSpinModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="spinPreviewResult" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 12px; border-radius: var(--radius-md); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; min-height: 100px;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnSpinAgain">🎲 Thử Bản Khác</button>
+        <button class="btn btn-primary" id="btnAcceptSpin">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

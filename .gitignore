@@ -1,0 +1,9 @@
+node_modules/
+dist/
+cloudflared.exe
+browser_profiles/
+data/browser_profiles/
+data/uploads/
+.gemini/
+.system_generated/
+*.log
