@@ -307,18 +307,23 @@ function startServer(port = 3000, parentEvents = null) {
     }
     console.log(`======================================================\n`);
 
-    // Tự động khởi chạy Cloudflare Tunnel tạo link HTTPS cho điện thoại
-    tunnel.startCloudflareTunnel(port, (url) => {
-      globalTunnelUrl = url;
-      if (sharedEvents) {
-        sharedEvents.emit('tunnel-url', url);
-        sharedEvents.emit('log', {
-          time: new Date().toLocaleTimeString('vi-VN'),
-          message: `🌐 Link Cloudflare cho Điện Thoại: ${url}`,
-          type: 'success'
-        });
-      }
-    });
+    if (process.env.RENDER_EXTERNAL_URL) {
+      globalTunnelUrl = process.env.RENDER_EXTERNAL_URL;
+      console.log(`🌐 Link Cloud Render cho Điện Thoại: ${globalTunnelUrl}`);
+    } else {
+      // Tự động khởi chạy Cloudflare Tunnel tạo link HTTPS cho điện thoại
+      tunnel.startCloudflareTunnel(port, (url) => {
+        globalTunnelUrl = url;
+        if (sharedEvents) {
+          sharedEvents.emit('tunnel-url', url);
+          sharedEvents.emit('log', {
+            time: new Date().toLocaleTimeString('vi-VN'),
+            message: `🌐 Link Cloudflare cho Điện Thoại: ${url}`,
+            type: 'success'
+          });
+        }
+      });
+    }
   });
 
   return serverInstance;
