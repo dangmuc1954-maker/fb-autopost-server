@@ -76,15 +76,30 @@ app.get('/api/events', (req, res) => {
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
     'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive'
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no' // Chống buffering proxy Nginx / Render
   });
   res.write('\n');
   sseClients.add(res);
+
+  // Gửi ngay ping khởi tạo
+  res.write(': keepalive\n\n');
 
   req.on('close', () => {
     sseClients.delete(res);
   });
 });
+
+// Giữ kết nối SSE không bị ngắt trên Render / Cloudflare / Safari
+setInterval(() => {
+  for (const res of sseClients) {
+    try {
+      res.write(': keepalive\n\n');
+    } catch (e) {
+      sseClients.delete(res);
+    }
+  }
+}, 15000);
 
 // --- API ENDPOINTS ---
 
@@ -161,6 +176,16 @@ app.post('/api/profiles/:id/sync-groups', async (req, res) => {
   }
 });
 
+// Trích xuất API Session & Cookie Facebook cho tài khoản (Đồng bộ API giống Tool Desktop)
+app.post('/api/profiles/:id/fetch-api', async (req, res) => {
+  try {
+    const result = await browserHub.fetchApiSession(req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
 // Nạp Cookie Facebook cho tài khoản (cho điện thoại)
 app.post('/api/profiles/:id/import-cookie', async (req, res) => {
   try {
@@ -227,6 +252,57 @@ app.get('/api/history', (req, res) => {
 app.post('/api/history/clear', (req, res) => {
   db.clearHistory();
   res.json({ success: true });
+});
+
+// Cập nhật tương tác (Like, Comment) của 1 bài viết trong lịch sử
+app.post('/api/history/:id/refresh-engagement', async (req, res) => {
+  try {
+    const history = db.getHistory();
+    const item = history.find(h => h.id === req.params.id);
+    if (!item || !item.postUrl) return res.json({ success: false, message: 'Không có link bài viết' });
+
+    const profileId = item.profileId || (db.getProfiles()[0] ? db.getProfiles()[0].id : null);
+    if (!profileId) return res.json({ success: false, message: 'Không tìm thấy tài khoản phù hợp' });
+
+    const stats = await browserHub.fetchPostEngagement(profileId, item.postUrl);
+    if (stats) {
+      db.updateHistoryItem(req.params.id, {
+        likesCount: stats.likes,
+        commentsCount: stats.comments
+      });
+      return res.json({ success: true, stats });
+    }
+    res.json({ success: false, message: 'Không thể đọc tương tác' });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Cập nhật tương tác tất cả bài viết trong lịch sử
+app.post('/api/history/refresh-all', async (req, res) => {
+  try {
+    const history = db.getHistory();
+    const postsWithUrl = history.filter(h => h.postUrl && h.postUrl.startsWith('http'));
+    let updatedCount = 0;
+
+    for (const item of postsWithUrl) {
+      const profileId = item.profileId || (db.getProfiles()[0] ? db.getProfiles()[0].id : null);
+      if (!profileId) continue;
+      try {
+        const stats = await browserHub.fetchPostEngagement(profileId, item.postUrl);
+        if (stats) {
+          db.updateHistoryItem(item.id, {
+            likesCount: stats.likes,
+            commentsCount: stats.comments
+          });
+          updatedCount++;
+        }
+      } catch (e) {}
+    }
+    res.json({ success: true, count: updatedCount, total: postsWithUrl.length });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
 });
 
 // 4. Cài đặt hệ thống

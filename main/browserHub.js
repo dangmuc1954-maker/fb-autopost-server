@@ -73,6 +73,9 @@ class BrowserHub {
       : (options.headless !== undefined ? options.headless : false);
 
     let chromeExecutable = settings.chromePath || process.env.CHROME_PATH;
+    if (chromeExecutable && !isWindows && chromeExecutable.includes(':\\')) {
+      chromeExecutable = null;
+    }
     if (!chromeExecutable && isWindows) {
       chromeExecutable = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
     }
@@ -387,7 +390,7 @@ class BrowserHub {
       page = active.page;
     } else {
       this.log(`Khởi động phiên Browser Hub [${profile.name}] để quét danh sách nhóm đã tham gia...`, 'info');
-      await this.openBrowser(profileId, { headless: false, skipNavigation: true });
+      await this.openBrowser(profileId, { headless: true, skipNavigation: true });
       const active = this.activeContexts.get(profileId);
       page = active.page;
       shouldCloseAfter = true;
