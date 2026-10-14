@@ -923,13 +923,20 @@ function setupHubControls() {
     }
   });
 
-  // ĐĂNG NHẬP TRÊN ĐIỆN THOẠI (INTERACTIVE CLOUD BROWSER)
+  // ĐĂNG NHẬP TRÊN ĐIỆN THOẠI (MỞ TRỰC TIẾP CHROME/SAFARI & KÍCH HOẠT LIVE BROWSER)
   const handleOpenPhoneLogin = () => {
     if (!selectedProfileId) {
       alert('Vui lòng chọn một tài khoản Facebook trước!');
       return;
     }
-    openInteractiveBrowser(selectedProfileId);
+    // Lập tức nhảy ra trang đăng nhập trực tiếp trên Chrome hoặc Safari của điện thoại
+    window.open('https://m.facebook.com/login.php', '_blank');
+
+    // Đồng thời chuyển khung giữa sang Phiên Trình Duyệt Trực Tiếp
+    const liveTab = document.querySelector('[data-subtab="subtab-live-browser"]');
+    if (liveTab) {
+      liveTab.click();
+    }
   };
 
   document.getElementById('btnHubPhoneLogin')?.addEventListener('click', handleOpenPhoneLogin);
