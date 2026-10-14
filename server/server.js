@@ -42,7 +42,13 @@ const upload = multer({ storage });
 
 // Phục vụ thư mục static của Web UI và Media uploads
 const webStaticDir = path.join(__dirname, '..', 'web');
-app.use(express.static(webStaticDir));
+app.use(express.static(webStaticDir, {
+  setHeaders: (res) => {
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+  }
+}));
 app.use('/uploads', express.static(uploadsDir));
 
 // --- SERVER-SENT EVENTS (SSE) CHO LOGS VÀ TIẾN TRÌNH REALTIME ---
