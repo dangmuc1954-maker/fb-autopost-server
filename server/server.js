@@ -232,6 +232,114 @@ app.get('/api/profiles/:id/screenshot', async (req, res) => {
   }
 });
 
+// KHỞI CHẠY TRÌNH DUYỆT TƯƠNG TÁC CHO ĐIỆN THOẠI (REMOTE CLOUD BROWSER)
+app.post('/api/profiles/:id/interactive/start', async (req, res) => {
+  try {
+    const { url = 'https://m.facebook.com/login.php', isMobile = true } = req.body || {};
+    const result = await browserHub.startInteractiveSession(req.params.id, { url, isMobile });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Chạm / Click vào màn hình
+app.post('/api/profiles/:id/interactive/click', async (req, res) => {
+  try {
+    const { xPercent, yPercent } = req.body || {};
+    const result = await browserHub.interactClick(req.params.id, { xPercent, yPercent });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Nhập văn bản
+app.post('/api/profiles/:id/interactive/type', async (req, res) => {
+  try {
+    const { text, pressEnter } = req.body || {};
+    const result = await browserHub.interactType(req.params.id, { text, pressEnter });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Nhấn phím
+app.post('/api/profiles/:id/interactive/key', async (req, res) => {
+  try {
+    const { key } = req.body || {};
+    const result = await browserHub.interactKey(req.params.id, { key });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Cuộn trang
+app.post('/api/profiles/:id/interactive/scroll', async (req, res) => {
+  try {
+    const { deltaY } = req.body || {};
+    const result = await browserHub.interactScroll(req.params.id, { deltaY });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Điều hướng
+app.post('/api/profiles/:id/interactive/navigate', async (req, res) => {
+  try {
+    const { url } = req.body || {};
+    const result = await browserHub.interactNavigate(req.params.id, { url });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Lấy cookie từ Bookmarklet trên điện thoại (Direct import từ Safari/Chrome Mobile)
+app.get('/api/cookie-import', async (req, res) => {
+  try {
+    const { profileId, cookie } = req.query || {};
+    if (!profileId || !cookie) {
+      return res.send(`<h2>Lỗi: Thiếu mã profileId hoặc cookie</h2><a href="/">Quay lại</a>`);
+    }
+    const result = await browserHub.importCookieSession(profileId, cookie);
+    if (result.isLoggedIn) {
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Đồng Bộ Thành Công</title>
+          <style>
+            body { font-family: -apple-system, sans-serif; background: #070a12; color: #fff; text-align: center; padding: 40px 15px; }
+            .card { background: rgba(15, 23, 42, 0.95); border: 1px solid #38bdf8; border-radius: 16px; padding: 26px 18px; max-width: 420px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+            h2 { color: #34d399; font-size: 20px; margin-bottom: 12px; }
+            p { color: #cbd5e1; font-size: 13.5px; line-height: 1.6; margin-bottom: 10px; }
+            .btn { display: inline-block; margin-top: 16px; padding: 12px 24px; background: linear-gradient(135deg, #0ea5e9, #38bdf8); color: #000; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="card">
+            <h2>🎉 ĐỒNG BỘ THÀNH CÔNG!</h2>
+            <p>Tài khoản <b>${result.name || 'Facebook'}</b> (UID: ${result.uid || ''}) đã được kết nối vào Web Tool!</p>
+            <p>Anh hãy đóng tab này và quay lại Web Tool để bắt đầu sử dụng nhé!</p>
+            <a href="/" class="btn">🚀 Mở Web Tool Ngay</a>
+          </div>
+        </body>
+        </html>
+      `);
+    } else {
+      res.send(`<h2>Lỗi đồng bộ: ${result.message || 'Cookie không hợp lệ hoặc đã hết hạn'}</h2><a href="/">Quay lại</a>`);
+    }
+  } catch (err) {
+    res.send(`<h2>Lỗi: ${err.message}</h2><a href="/">Quay lại</a>`);
+  }
+});
+
 // 2. Quản lý Kho bài viết (Posts)
 app.get('/api/posts', (req, res) => {
   res.json(db.getPosts());

@@ -95,9 +95,13 @@ class BrowserHub {
 
     const launchOptions = {
       headless: isHeadless,
-      viewport: null,
+      viewport: options.viewport !== undefined ? options.viewport : null,
       args: launchArgs
     };
+
+    if (options.userAgent) {
+      launchOptions.userAgent = options.userAgent;
+    }
 
     if (chromeExecutable && fs.existsSync(chromeExecutable)) {
       launchOptions.executablePath = chromeExecutable;
@@ -112,6 +116,10 @@ class BrowserHub {
       const context = await chromium.launchPersistentContext(profileDir, launchOptions);
       const pages = context.pages();
       const page = pages.length > 0 ? pages[0] : await context.newPage();
+
+      if (options.viewport) {
+        await page.setViewportSize(options.viewport).catch(() => {});
+      }
 
       this.activeContexts.set(profileId, { context, page });
       db.updateProfile(profileId, { status: 'open' });
@@ -711,6 +719,102 @@ class BrowserHub {
         }
       }
     }
+  // --- KHỞI CHẠY PHIÊN TRÌNH DUYỆT TƯƠNG TÁC CHO ĐIỆN THOẠI (REMOTE CLOUD BROWSER) ---
+  async startInteractiveSession(profileId, { url = 'https://m.facebook.com/login.php', isMobile = true } = {}) {
+    const profile = db.getProfile(profileId);
+    if (!profile) throw new Error('Không tìm thấy tài khoản');
+
+    let page = null;
+    let context = null;
+
+    if (this.isBrowserOpen(profileId)) {
+      const active = this.activeContexts.get(profileId);
+      page = active.page;
+      context = active.context;
+    } else {
+      this.log(`Khởi chạy trình duyệt tương tác di động cho [${profile.name}]...`, 'info');
+      await this.openBrowser(profileId, {
+        headless: true,
+        skipNavigation: true,
+        viewport: isMobile ? { width: 412, height: 915 } : { width: 1280, height: 800 },
+        userAgent: isMobile ? 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36' : undefined
+      });
+      const active = this.activeContexts.get(profileId);
+      page = active.page;
+      context = active.context;
+    }
+
+    if (url) {
+      this.log(`Điều hướng đến: ${url}`, 'info');
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 }).catch(err => {
+        this.log(`Lỗi tải trang: ${err.message}`, 'warning');
+      });
+    }
+
+    return { success: true, url: page.url() };
+  }
+
+  // Chạm / Click vào tọa độ phần trăm trên màn hình
+  async interactClick(profileId, { xPercent = 50, yPercent = 50 }) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    const vp = page.viewportSize() || { width: 412, height: 915 };
+    const realX = Math.round((xPercent / 100) * vp.width);
+    const realY = Math.round((yPercent / 100) * vp.height);
+
+    await page.mouse.click(realX, realY);
+    await new Promise(r => setTimeout(r, 600));
+    return { success: true, url: page.url() };
+  }
+
+  // Nhập văn bản vào ô đang focus
+  async interactType(profileId, { text = '', pressEnter = false }) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    if (text) {
+      await page.keyboard.type(text, { delay: 40 });
+    }
+    if (pressEnter) {
+      await page.keyboard.press('Enter');
+    }
+    await new Promise(r => setTimeout(r, 600));
+    return { success: true, url: page.url() };
+  }
+
+  // Nhấn phím
+  async interactKey(profileId, { key = 'Enter' }) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    await page.keyboard.press(key);
+    await new Promise(r => setTimeout(r, 600));
+    return { success: true, url: page.url() };
+  }
+
+  // Cuộn trang
+  async interactScroll(profileId, { deltaY = 300 }) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    await page.mouse.wheel(0, deltaY);
+    await new Promise(r => setTimeout(r, 400));
+    return { success: true, url: page.url() };
+  }
+
+  // Điều hướng URL
+  async interactNavigate(profileId, { url }) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    return { success: true, url: page.url() };
   }
 }
 

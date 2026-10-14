@@ -672,6 +672,98 @@
     </div>
   </div>
 
+  <!-- MODAL: TRÌNH DUYỆT ẢO TƯƠNG TÁC TRÊN ĐIỆN THOẠI (REMOTE PHONE BROWSER) -->
+  <div class="modal-overlay" id="modalInteractiveBrowser">
+    <div class="modal-box interactive-browser-box" style="max-width: 480px; width: 96%; height: 92vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: var(--radius-lg); background: #070a12; border: 1px solid var(--accent-cyan);">
+      <!-- TOP BROWSER BAR -->
+      <div style="padding: 10px 14px; background: rgba(15, 23, 42, 0.98); border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 6px; flex: 1; overflow: hidden;">
+          <span style="font-size: 16px;">📱</span>
+          <span id="interactiveBrowserTitle" style="font-weight: 700; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Trình Duyệt Facebook Trực Tiếp
+          </span>
+          <span class="status-pill logged-in" style="font-size: 10px; padding: 1px 6px;">Live</span>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button class="btn btn-secondary btn-sm" id="btnInteractiveReload" title="Tải lại trang" style="padding: 3px 8px; font-size: 12px;">🔄</button>
+          <button class="modal-close" id="btnCloseInteractiveBrowser" style="position: static; font-size: 20px; line-height: 1;">&times;</button>
+        </div>
+      </div>
+
+      <!-- NOTICE BANNER FOR 2FA & CHECKS -->
+      <div style="background: rgba(59, 130, 246, 0.15); border-bottom: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; font-size: 11px; color: #93c5fd; display: flex; align-items: center; justify-content: space-between;">
+        <span>💡 Chạm trực tiếp vào màn hình để bấm nút hoặc duyệt 2FA!</span>
+        <button id="btnOpenPhoneBookmarkletModal" style="background: none; border: none; color: var(--accent-cyan); font-weight: 600; font-size: 10.5px; text-decoration: underline; cursor: pointer;">
+          Dùng Chrome ĐT
+        </button>
+      </div>
+
+      <!-- SCREEN VIEWER WITH TOUCH INTERACTION -->
+      <div id="interactiveScreenWrapper" style="flex: 1; position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; cursor: crosshair;">
+        <img id="imgInteractiveScreen" src="" alt="Facebook Mobile Screen" style="width: 100%; height: 100%; object-fit: contain; display: block; user-select: none; -webkit-user-drag: none;">
+        <div id="interactiveScreenLoading" style="position: absolute; color: var(--accent-cyan); font-size: 12.5px; font-weight: 600; background: rgba(0,0,0,0.85); padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-subtle);">
+          ⏳ Đang kết nối màn hình Facebook...
+        </div>
+        <div id="interactiveClickRipple" style="position: absolute; width: 28px; height: 28px; border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.4); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%) scale(0); transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;"></div>
+      </div>
+
+      <!-- QUICK KEYBOARD & ACTION TOOLBAR -->
+      <div style="padding: 8px 12px; background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px;">
+        <!-- TYPING INPUT BOX -->
+        <div style="display: flex; gap: 6px;">
+          <input type="text" class="form-control" id="inputInteractiveType" placeholder="Gõ chữ / mật khẩu / mã 2FA rồi bấm Gửi..." style="flex: 1; font-size: 12.5px; padding: 6px 10px;">
+          <button class="btn btn-cyan btn-sm" id="btnInteractiveSendText" style="padding: 6px 12px; font-size: 12px; font-weight: 600;">
+            Gửi ↵
+          </button>
+        </div>
+
+        <!-- QUICK ACTION BUTTONS -->
+        <div style="display: flex; gap: 6px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; gap: 4px;">
+            <button class="btn btn-secondary btn-sm" id="btnKeyEnter" style="padding: 4px 8px; font-size: 11px;">↵ Enter</button>
+            <button class="btn btn-secondary btn-sm" id="btnKeyBackspace" style="padding: 4px 8px; font-size: 11px;">⌫ Xóa</button>
+            <button class="btn btn-secondary btn-sm" id="btnScrollDown" style="padding: 4px 8px; font-size: 11px;">⬇ Cuộn xuống</button>
+            <button class="btn btn-secondary btn-sm" id="btnScrollUp" style="padding: 4px 8px; font-size: 11px;">⬆ Cuộn lên</button>
+          </div>
+        </div>
+
+        <!-- BIG FINISH & SYNC BUTTON -->
+        <button class="btn btn-primary btn-full" id="btnInteractiveFinishSync" style="font-weight: 700; font-size: 13.5px; padding: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); margin-top: 2px;">
+          🎉 ĐÃ DUYỆT XONG - ĐỒNG BỘ TÀI KHOẢN NGAY
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HƯỚNG DẪN DÙNG CHROME / SAFARI ĐIỆN THOẠI (BOOKMARKLET 1 CHẠM) -->
+  <div class="modal-overlay" id="modalBookmarkletGuide">
+    <div class="modal-box" style="max-width: 480px; width: 95%;">
+      <div class="modal-header">
+        <h3>🌐 Đăng Nhập Bằng Chrome/Safari Trên Điện Thoại</h3>
+        <button class="modal-close" id="btnCloseBookmarkletModal">&times;</button>
+      </div>
+      <div class="modal-body" style="font-size: 12.5px; line-height: 1.6; color: #cbd5e1;">
+        <p style="margin-bottom: 10px;">
+          Nếu anh thích tự mở ứng dụng <b>Google Chrome</b> hoặc <b>Safari</b> trên điện thoại để đăng nhập Facebook cá nhân của anh cho quen thuộc:
+        </p>
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px;">
+          <div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px;">Bước 1:</div>
+          <p style="margin-bottom: 8px;">Mở tab mới trên điện thoại và đăng nhập nick của anh tại: <a href="https://m.facebook.com" target="_blank" style="color: #38bdf8;">m.facebook.com</a> (duyệt 2FA bình thường trên điện thoại).</p>
+          <div style="font-weight: 700; color: var(--accent-cyan); margin-bottom: 4px;">Bước 2:</div>
+          <p style="margin-bottom: 8px;">Sau khi đăng nhập xong, copy đoạn mã 1 chạm bên dưới, dán vào thanh địa chỉ của tab Facebook rồi bấm Enter:</p>
+          <textarea id="txtBookmarkletCode" class="form-control" rows="3" readonly style="font-family: monospace; font-size: 11px; background: #000; color: #34d399;"></textarea>
+          <button class="btn btn-secondary btn-full" id="btnCopyBookmarklet" style="margin-top: 6px; font-size: 11.5px;">📋 Sao Chép Mã 1 Chạm</button>
+        </div>
+        <p style="font-size: 11.5px; color: var(--text-dim);">
+          ⚡ Ngay khi bấm Enter, tài khoản Facebook sẽ được tự động đồng bộ vào Web Tool tức thì mà không cần máy tính!
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="btnDismissBookmarklet">Đã Hiểu</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: TEST BẢN SPIN -->
   <div class="modal-overlay" id="modalSpinPreview">
     <div class="modal-box" style="width: 520px;">
