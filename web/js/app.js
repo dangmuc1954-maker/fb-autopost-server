@@ -119,6 +119,7 @@ if (!window.electronAPI) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(options)
     }),
+    getInteractiveStatus: (profileId) => apiFetch(`/api/profiles/${profileId}/interactive/status`),
     interactClick: (profileId, data) => apiFetch(`/api/profiles/${profileId}/interactive/click`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -135,6 +136,21 @@ if (!window.electronAPI) {
       body: JSON.stringify(data)
     }),
     interactScroll: (profileId, data) => apiFetch(`/api/profiles/${profileId}/interactive/scroll`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }),
+    interactNavigate: (profileId, data) => apiFetch(`/api/profiles/${profileId}/interactive/navigate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }),
+    interactQuickFill: (profileId, data) => apiFetch(`/api/profiles/${profileId}/interactive/quick-fill`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    }),
+    interactFill2FA: (profileId, data) => apiFetch(`/api/profiles/${profileId}/interactive/fill-2fa`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -593,8 +609,14 @@ window.startEmbeddedBrowser = async (profileId) => {
   }
 };
 
+let embeddedStatusTimer = null;
+let isEmbeddedAutoSyncTriggered = false;
+let userHasToggledScreenSize = false;
+
 function startEmbeddedStream(profileId) {
   if (embeddedStreamTimer) clearInterval(embeddedStreamTimer);
+  if (embeddedStatusTimer) clearInterval(embeddedStatusTimer);
+  isEmbeddedAutoSyncTriggered = false;
 
   const fetchFrame = () => {
     if (!isEmbeddedStreaming || !selectedProfileId) return;
@@ -609,6 +631,20 @@ function startEmbeddedStream(profileId) {
       if (img) {
         img.src = url;
         img.style.display = 'block';
+
+        // Tự động tối ưu khung hiển thị theo tỷ lệ màn hình Facebook (Desktop vs Mobile)
+        const wrapper = document.getElementById('embeddedScreenWrapper');
+        if (wrapper && !userHasToggledScreenSize && nextImg.naturalWidth && nextImg.naturalHeight) {
+          if (nextImg.naturalWidth >= nextImg.naturalHeight) {
+            // Facebook Desktop (1280x800) -> Mở rộng khung nhìn sang 960px
+            wrapper.style.maxWidth = '960px';
+            wrapper.style.height = '600px';
+          } else {
+            // Facebook Mobile (412x915) -> Giữ khung dọc 420px
+            wrapper.style.maxWidth = '420px';
+            wrapper.style.height = '720px';
+          }
+        }
       }
       if (loading) loading.style.display = 'none';
     };
@@ -616,7 +652,43 @@ function startEmbeddedStream(profileId) {
   };
 
   fetchFrame();
-  embeddedStreamTimer = setInterval(fetchFrame, 1800);
+  embeddedStreamTimer = setInterval(fetchFrame, 1500);
+
+  // Tự động kiểm tra trạng thái phiên Facebook (nhận diện thành công qua c_user cookie)
+  const checkStatus = async () => {
+    if (!isEmbeddedStreaming || !selectedProfileId || isEmbeddedAutoSyncTriggered) return;
+    try {
+      const res = await window.electronAPI.getInteractiveStatus(profileId);
+      if (!isEmbeddedStreaming || isEmbeddedAutoSyncTriggered) return;
+
+      if (res.isLoggedIn && !isEmbeddedAutoSyncTriggered) {
+        isEmbeddedAutoSyncTriggered = true;
+        const autoSuccess = document.getElementById('embeddedAutoSuccess');
+        const successText = document.getElementById('embeddedSuccessText');
+        if (autoSuccess) autoSuccess.style.display = 'flex';
+        if (successText) {
+          successText.textContent = `🎉 Phát hiện UID: ${res.uid || ''}. Đang tự động hút UID, Avatar & Token API...`;
+        }
+
+        appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `🎉 Facebook đã đăng nhập thành công (UID: ${res.uid})! Đang tự động lưu phiên...`, type: 'success' });
+
+        try {
+          const syncRes = await window.electronAPI.fetchApiSession(profileId);
+          setTimeout(async () => {
+            if (autoSuccess) autoSuccess.style.display = 'none';
+            await loadProfiles();
+            alert(`🎉 ĐĂNG NHẬP & ĐỒNG BỘ THÀNH CÔNG!\nChào mừng ${syncRes.name || 'Facebook'} (UID: ${syncRes.uid || res.uid})`);
+            const groupsTab = document.querySelector('[data-subtab="subtab-groups"]');
+            if (groupsTab) groupsTab.click();
+          }, 1500);
+        } catch (e) {
+          console.error('[Embedded Auto Sync Error]', e);
+        }
+      }
+    } catch(e) {}
+  };
+
+  embeddedStatusTimer = setInterval(checkStatus, 1500);
 }
 
 function stopEmbeddedStream() {
@@ -624,6 +696,10 @@ function stopEmbeddedStream() {
   if (embeddedStreamTimer) {
     clearInterval(embeddedStreamTimer);
     embeddedStreamTimer = null;
+  }
+  if (embeddedStatusTimer) {
+    clearInterval(embeddedStatusTimer);
+    embeddedStatusTimer = null;
   }
 }
 
@@ -693,11 +769,26 @@ function setupHubControls() {
   const handleOpenNewFbTab = () => {
     window.open('https://m.facebook.com', '_blank');
     if (selectedProfileId) {
-      openBookmarkletModal(selectedProfileId);
+      openChromeSyncModal(selectedProfileId);
     }
   };
   document.getElementById('btnEmbeddedOpenNewTab')?.addEventListener('click', handleOpenNewFbTab);
   document.getElementById('btnInspectorOpenNewTab')?.addEventListener('click', handleOpenNewFbTab);
+
+  // Nút Đăng nhập trên điện thoại (Mở Modal Lựa Chọn Cả 2 Cách)
+  const handlePhoneLogin = () => {
+    if (!selectedProfileId) {
+      if (currentProfiles.length > 0) {
+        selectedProfileId = currentProfiles[0].id;
+      } else {
+        alert('Vui lòng tạo một tài khoản trước!');
+        return;
+      }
+    }
+    openLoginChoiceModal(selectedProfileId);
+  };
+  document.getElementById('btnHubPhoneLogin')?.addEventListener('click', handlePhoneLogin);
+  document.getElementById('btnInspectorPhoneLogin')?.addEventListener('click', handlePhoneLogin);
 
   const handleFinishEmbeddedSync = async () => {
     if (!selectedProfileId) return;
@@ -729,30 +820,42 @@ function setupHubControls() {
   document.getElementById('btnEmbeddedSync')?.addEventListener('click', handleFinishEmbeddedSync);
   document.getElementById('btnEmbeddedFinishSync')?.addEventListener('click', handleFinishEmbeddedSync);
 
-  // Chạm vào màn hình để gửi click
+  // Nút chuyển đổi kích thước hiển thị (Màn hình lớn máy tính / Màn hình dọc điện thoại)
+  document.getElementById('btnToggleScreenSize')?.addEventListener('click', () => {
+    userHasToggledScreenSize = true;
+    const wrapper = document.getElementById('embeddedScreenWrapper');
+    const btn = document.getElementById('btnToggleScreenSize');
+    if (!wrapper) return;
+    const isCurrentlyWide = wrapper.style.maxWidth === '960px' || !wrapper.style.maxWidth;
+    if (isCurrentlyWide) {
+      wrapper.style.maxWidth = '420px';
+      wrapper.style.height = '720px';
+      if (btn) btn.textContent = '📱 Khổ Điện Thoại (Gọn)';
+    } else {
+      wrapper.style.maxWidth = '960px';
+      wrapper.style.height = '600px';
+      if (btn) btn.textContent = '🖥️ Khổ Máy Tính (Rộng)';
+    }
+  });
+
+  // TƯƠNG TÁC TRỰC TIẾP TRÊN MÀN HÌNH BROWSER (CLICK VÀO ĐÂU - GÕ VÀO ĐÓ)
   const embWrapper = document.getElementById('embeddedScreenWrapper');
   const embImg = document.getElementById('imgEmbeddedScreen');
   const embRipple = document.getElementById('embeddedClickRipple');
+  const embDirectReceiver = document.getElementById('embeddedDirectKeyReceiver');
 
   if (embWrapper && embImg) {
     const handleEmbClick = async (e) => {
       if (!selectedProfileId || !isEmbeddedStreaming) return;
-      const rect = embImg.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-        return;
-      }
-
-      const xPercent = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-      const yPercent = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+      const coords = getNormalizedCoordinates(embImg, clientX, clientY);
+      if (!coords) return;
 
       if (embRipple) {
-        embRipple.style.left = `${clientX - rect.left + embImg.offsetLeft}px`;
-        embRipple.style.top = `${clientY - rect.top + embImg.offsetTop}px`;
+        embRipple.style.left = `${coords.localX}px`;
+        embRipple.style.top = `${coords.localY}px`;
         embRipple.style.opacity = '1';
         embRipple.style.transform = 'translate(-50%, -50%) scale(1.5)';
         setTimeout(() => {
@@ -761,12 +864,19 @@ function setupHubControls() {
         }, 300);
       }
 
+      // Kích hoạt bàn phím ảo trên điện thoại và trỏ phím trên máy tính
+      if (embDirectReceiver) {
+        embDirectReceiver.focus();
+      }
+      embWrapper.focus();
+
       try {
-        await window.electronAPI.interactClick(selectedProfileId, { xPercent, yPercent });
+        await window.electronAPI.interactClick(selectedProfileId, { xPercent: coords.xPercent, yPercent: coords.yPercent });
         setTimeout(() => {
-          const timestamp = Date.now();
-          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-        }, 700);
+          if (embImg && selectedProfileId) {
+            embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }
+        }, 180);
       } catch (err) {
         console.error('[Touch Error]', err);
       }
@@ -775,55 +885,146 @@ function setupHubControls() {
     embWrapper.addEventListener('click', handleEmbClick);
   }
 
-  // Gửi chữ vào ô nhập
-  const sendEmbText = async () => {
-    const input = document.getElementById('inputEmbeddedType');
-    if (!input || !selectedProfileId) return;
-    const text = input.value;
-    if (!text) return;
-    input.value = '';
-    try {
+  // GÕ PHÍM TRỰC TIẾP TỪ BÀN PHÍM (DESKTOP & MOBILE KEYBOARD RECEIVER)
+  if (embDirectReceiver) {
+    // 1. Nhận ký tự chữ, số, tiếng Việt Unikey/Telex/VNI từ bàn phím
+    embDirectReceiver.addEventListener('input', async () => {
+      if (!selectedProfileId || !isEmbeddedStreaming) return;
+      const text = embDirectReceiver.value;
+      if (!text) return;
+      embDirectReceiver.value = ''; // Xóa ngay để nhận ký tự kế tiếp
+      try {
+        await window.electronAPI.interactType(selectedProfileId, { text, pressEnter: false });
+        setTimeout(() => {
+          if (embImg && selectedProfileId) {
+            embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }
+        }, 180);
+      } catch (err) {
+        console.error('[Direct Type Error]', err);
+      }
+    });
+
+    // 2. Nhận các phím đặc biệt (Enter, Backspace, Tab)
+    embDirectReceiver.addEventListener('keydown', async (e) => {
+      if (!selectedProfileId || !isEmbeddedStreaming) return;
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
+        setTimeout(() => {
+          if (embImg && selectedProfileId) {
+            embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }
+        }, 250);
+      } else if (e.key === 'Backspace' && embDirectReceiver.value.length === 0) {
+        e.preventDefault();
+        await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+        setTimeout(() => {
+          if (embImg && selectedProfileId) {
+            embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }
+        }, 180);
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        await window.electronAPI.interactKey(selectedProfileId, { key: 'Tab' });
+        setTimeout(() => {
+          if (embImg && selectedProfileId) {
+            embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }
+        }, 200);
+      }
+    });
+  }
+
+  // 3. Nhận phím trực tiếp khi click trỏ chuột vào vùng màn hình trên máy tính
+  embWrapper?.addEventListener('keydown', async (e) => {
+    if (!selectedProfileId || !isEmbeddedStreaming) return;
+    if (document.activeElement === embDirectReceiver) return;
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') && document.activeElement.id !== 'embeddedDirectKeyReceiver') {
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
+      setTimeout(() => {
+        if (embImg && selectedProfileId) {
+          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }
+      }, 250);
+    } else if (e.key === 'Backspace') {
+      e.preventDefault();
+      await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+      setTimeout(() => {
+        if (embImg && selectedProfileId) {
+          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }
+      }, 180);
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      await window.electronAPI.interactType(selectedProfileId, { text: e.key, pressEnter: false });
+      setTimeout(() => {
+        if (embImg && selectedProfileId) {
+          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }
+      }, 180);
+    }
+  });
+
+  // 4. Hỗ trợ dán văn bản (Ctrl+V / Cmd+V) trực tiếp vào trình duyệt
+  window.addEventListener('paste', async (e) => {
+    if (!selectedProfileId || !isEmbeddedStreaming) return;
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') && document.activeElement.id !== 'embeddedDirectKeyReceiver') {
+      return;
+    }
+    const text = e.clipboardData?.getData('text') || '';
+    if (text) {
+      e.preventDefault();
       await window.electronAPI.interactType(selectedProfileId, { text, pressEnter: false });
       setTimeout(() => {
-        const timestamp = Date.now();
-        if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-      }, 600);
-    } catch (err) {
-      alert('Lỗi gõ chữ: ' + err.message);
+        if (embImg && selectedProfileId) {
+          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }
+      }, 250);
     }
-  };
-
-  document.getElementById('btnEmbeddedSendText')?.addEventListener('click', sendEmbText);
-  document.getElementById('inputEmbeddedType')?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendEmbText();
   });
+
+  // Các nút điều khiển nhanh (Enter, Xóa, Cuộn)
   document.getElementById('btnEmbeddedEnter')?.addEventListener('click', async () => {
     if (!selectedProfileId) return;
     await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
     setTimeout(() => {
-      const timestamp = Date.now();
-      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-    }, 700);
+      if (embImg && selectedProfileId) {
+        embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }
+    }, 300);
   });
   document.getElementById('btnEmbeddedBackspace')?.addEventListener('click', async () => {
     if (!selectedProfileId) return;
     await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+    setTimeout(() => {
+      if (embImg && selectedProfileId) {
+        embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }
+    }, 180);
   });
   document.getElementById('btnEmbeddedScrollDown')?.addEventListener('click', async () => {
     if (!selectedProfileId) return;
     await window.electronAPI.interactScroll(selectedProfileId, { deltaY: 350 });
     setTimeout(() => {
-      const timestamp = Date.now();
-      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-    }, 500);
+      if (embImg && selectedProfileId) {
+        embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }
+    }, 300);
   });
   document.getElementById('btnEmbeddedScrollUp')?.addEventListener('click', async () => {
     if (!selectedProfileId) return;
     await window.electronAPI.interactScroll(selectedProfileId, { deltaY: -350 });
     setTimeout(() => {
-      const timestamp = Date.now();
-      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-    }, 500);
+      if (embImg && selectedProfileId) {
+        embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }
+    }, 300);
   });
 
   // Search input
@@ -1632,6 +1833,7 @@ function setupModals() {
     selectedProfileId = created.id;
     modalAdd?.classList.remove('active');
     await loadProfiles();
+    openLoginChoiceModal(created.id);
   });
 
   // Modal Quick Login (Đăng nhập nhanh cho Cloud / Điện thoại)
@@ -1793,35 +1995,113 @@ function setupModals() {
     }
   });
 
-  // === MODAL: TRÌNH DUYỆT ẢO TƯƠNG TÁC TRÊN ĐIỆN THOẠI (REMOTE PHONE BROWSER) ===
+  // === MODAL: LỰA CHỌN PHƯƠNG THỨC ĐĂNG NHẬP (CẢ 2 HƯỚNG) ===
+  const modalLoginChoice = document.getElementById('modalLoginChoice');
+  window.openLoginChoiceModal = (profileId) => {
+    selectedProfileId = profileId;
+    const p = currentProfiles.find(item => item.id === profileId);
+    const title = document.getElementById('modalLoginChoiceTitle');
+    if (title) title.textContent = `📱 Đăng Nhập Cho [${p ? p.name : 'Tài khoản'}]`;
+    modalLoginChoice?.classList.add('active');
+  };
+
+  document.getElementById('btnCloseLoginChoice')?.addEventListener('click', () => modalLoginChoice?.classList.remove('active'));
+  document.getElementById('btnDismissLoginChoice')?.addEventListener('click', () => modalLoginChoice?.classList.remove('active'));
+
+  // Nút kích hoạt Cách 1: Khung trình duyệt trực tiếp
+  document.getElementById('btnLaunchMiniBrowser')?.addEventListener('click', () => {
+    modalLoginChoice?.classList.remove('active');
+    if (selectedProfileId) openInteractiveBrowser(selectedProfileId);
+  });
+  document.getElementById('choiceOptMiniBrowser')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'btnLaunchMiniBrowser') return;
+    modalLoginChoice?.classList.remove('active');
+    if (selectedProfileId) openInteractiveBrowser(selectedProfileId);
+  });
+
+  // Nút kích hoạt Cách 2: Mở Chrome điện thoại & Phê duyệt
+  document.getElementById('btnLaunchChromeSync')?.addEventListener('click', () => {
+    modalLoginChoice?.classList.remove('active');
+    if (selectedProfileId) openChromeSyncModal(selectedProfileId);
+  });
+  document.getElementById('choiceOptChromeSync')?.addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'btnLaunchChromeSync') return;
+    modalLoginChoice?.classList.remove('active');
+    if (selectedProfileId) openChromeSyncModal(selectedProfileId);
+  });
+
+  // === CÁCH 1: KHUNG TRÌNH DUYỆT TRỰC TIẾP (MINI IN-APP BROWSER) ===
   let interactiveStreamTimer = null;
+  let interactiveStatusTimer = null;
   let isInteractiveActive = false;
+  let isAutoSyncTriggered = false;
 
   window.openInteractiveBrowser = async (profileId) => {
     if (!profileId) return;
+    selectedProfileId = profileId;
     const p = currentProfiles.find(item => item.id === profileId);
     const modal = document.getElementById('modalInteractiveBrowser');
-    const title = document.getElementById('interactiveBrowserTitle');
+    const urlBar = document.getElementById('miniBrowserUrlBar');
     const img = document.getElementById('imgInteractiveScreen');
     const loading = document.getElementById('interactiveScreenLoading');
+    const autoSuccess = document.getElementById('interactiveAutoSuccess');
 
-    if (title) title.textContent = `FB: ${p ? p.name : 'Tài khoản'}`;
+    if (autoSuccess) autoSuccess.style.display = 'none';
+    if (urlBar) urlBar.value = 'https://m.facebook.com/login.php';
     modal?.classList.add('active');
     isInteractiveActive = true;
+    isAutoSyncTriggered = false;
 
     if (loading) {
       loading.style.display = 'block';
-      loading.textContent = '⏳ Đang khởi chạy trình duyệt Facebook...';
+      loading.textContent = `⏳ Đang kết nối Facebook cho [${p ? p.name : ''}]...`;
     }
     if (img) img.style.display = 'none';
 
     try {
       await window.electronAPI.startInteractiveBrowser(profileId, { url: 'https://m.facebook.com/login.php', isMobile: true });
       startInteractiveStream(profileId);
+      startStatusPolling(profileId);
     } catch (err) {
       alert('Không thể mở trình duyệt: ' + err.message);
     }
   };
+
+  // Tính toán toạ độ chạm CHUẨN XÁC tuyệt đối, loại bỏ khoảng đệm letterbox do object-fit: contain
+  function getNormalizedCoordinates(img, clientX, clientY) {
+    const rect = img.getBoundingClientRect();
+    const naturalWidth = img.naturalWidth || 412;
+    const naturalHeight = img.naturalHeight || 915;
+    const naturalRatio = naturalWidth / naturalHeight;
+    const elementRatio = rect.width / rect.height;
+
+    let renderWidth = rect.width;
+    let renderHeight = rect.height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (elementRatio > naturalRatio) {
+      renderWidth = rect.height * naturalRatio;
+      offsetX = (rect.width - renderWidth) / 2;
+    } else {
+      renderHeight = rect.width / naturalRatio;
+      offsetY = (rect.height - renderHeight) / 2;
+    }
+
+    const relativeX = clientX - rect.left - offsetX;
+    const relativeY = clientY - rect.top - offsetY;
+
+    if (relativeX < 0 || relativeX > renderWidth || relativeY < 0 || relativeY > renderHeight) {
+      return null;
+    }
+
+    return {
+      xPercent: (relativeX / renderWidth) * 100,
+      yPercent: (relativeY / renderHeight) * 100,
+      localX: clientX - rect.left,
+      localY: clientY - rect.top
+    };
+  }
 
   function startInteractiveStream(profileId) {
     if (interactiveStreamTimer) clearInterval(interactiveStreamTimer);
@@ -1846,7 +2126,56 @@ function setupModals() {
     };
 
     fetchFrame();
-    interactiveStreamTimer = setInterval(fetchFrame, 1800);
+    interactiveStreamTimer = setInterval(fetchFrame, 1500);
+  }
+
+  // Tự động quét trạng thái đăng nhập và địa chỉ URL thời gian thực
+  function startStatusPolling(profileId) {
+    if (interactiveStatusTimer) clearInterval(interactiveStatusTimer);
+
+    const checkStatus = async () => {
+      if (!isInteractiveActive || isAutoSyncTriggered) return;
+      try {
+        const res = await window.electronAPI.getInteractiveStatus(profileId);
+        if (!isInteractiveActive || isAutoSyncTriggered) return;
+
+        // Cập nhật thanh địa chỉ
+        if (res.url) {
+          const urlBar = document.getElementById('miniBrowserUrlBar');
+          if (urlBar) urlBar.value = res.url;
+        }
+
+        // TỰ ĐỘNG NHẬN DIỆN KHI ĐĂNG NHẬP THÀNH CÔNG (c_user xuất hiện)
+        if (res.isLoggedIn && !isAutoSyncTriggered) {
+          isAutoSyncTriggered = true;
+          const autoSuccess = document.getElementById('interactiveAutoSuccess');
+          const successText = document.getElementById('interactiveSuccessText');
+          if (autoSuccess) autoSuccess.style.display = 'flex';
+          if (successText) {
+            successText.textContent = `🎉 Phát hiện UID: ${res.uid || ''}. Đang đồng bộ thông tin và lưu phiên...`;
+          }
+
+          appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `🎉 Facebook đã đăng nhập thành công (UID: ${res.uid})! Đang tự động hút Session...`, type: 'success' });
+
+          // Hút session và đồng bộ
+          try {
+            const syncRes = await window.electronAPI.fetchApiSession(profileId);
+            setTimeout(async () => {
+              stopInteractiveStream();
+              document.getElementById('modalInteractiveBrowser')?.classList.remove('active');
+              await loadProfiles();
+              alert(`🎉 ĐĂNG NHẬP & ĐỒNG BỘ THÀNH CÔNG!\nChào mừng ${syncRes.name || 'Facebook'} (UID: ${syncRes.uid || res.uid})`);
+            }, 1600);
+          } catch (e) {
+            console.error('[Auto Sync Error]', e);
+          }
+        }
+      } catch (e) {
+        // bỏ qua lỗi polling
+      }
+    };
+
+    interactiveStatusTimer = setInterval(checkStatus, 1500);
   }
 
   function stopInteractiveStream() {
@@ -1855,22 +2184,52 @@ function setupModals() {
       clearInterval(interactiveStreamTimer);
       interactiveStreamTimer = null;
     }
+    if (interactiveStatusTimer) {
+      clearInterval(interactiveStatusTimer);
+      interactiveStatusTimer = null;
+    }
   }
 
+  // Đóng khung browser
   document.getElementById('btnCloseInteractiveBrowser')?.addEventListener('click', () => {
     stopInteractiveStream();
     document.getElementById('modalInteractiveBrowser')?.classList.remove('active');
   });
 
-  document.getElementById('btnInteractiveReload')?.addEventListener('click', () => {
-    if (selectedProfileId) {
-      const img = document.getElementById('imgInteractiveScreen');
-      const timestamp = Date.now();
-      if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-    }
+  // Tải lại trang (Reload)
+  document.getElementById('btnMiniBrowserReload')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    const urlBar = document.getElementById('miniBrowserUrlBar');
+    const currentUrl = urlBar ? urlBar.value : 'https://m.facebook.com/login.php';
+    try {
+      await window.electronAPI.interactNavigate(selectedProfileId, { url: currentUrl });
+      setTimeout(() => {
+        const img = document.getElementById('imgInteractiveScreen');
+        if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }, 500);
+    } catch(e) {}
   });
 
-  // Chạm vào màn hình để gửi click
+  // Nút Trang chủ / Về Login
+  document.getElementById('btnMiniBrowserBack')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    try {
+      await window.electronAPI.interactNavigate(selectedProfileId, { url: 'https://m.facebook.com/login.php' });
+      setTimeout(() => {
+        const img = document.getElementById('imgInteractiveScreen');
+        if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }, 600);
+    } catch(e) {}
+  });
+
+  // Chuyển sang mở Chrome từ khung browser
+  document.getElementById('btnMiniSwitchChrome')?.addEventListener('click', () => {
+    stopInteractiveStream();
+    document.getElementById('modalInteractiveBrowser')?.classList.remove('active');
+    if (selectedProfileId) openChromeSyncModal(selectedProfileId);
+  });
+
+  // TƯƠNG TÁC CHẠM CẢM ỨNG (TOUCH / CLICK)
   const screenWrapper = document.getElementById('interactiveScreenWrapper');
   const screenImg = document.getElementById('imgInteractiveScreen');
   const ripple = document.getElementById('interactiveClickRipple');
@@ -1878,22 +2237,15 @@ function setupModals() {
   if (screenWrapper && screenImg) {
     const handleScreenClick = async (e) => {
       if (!selectedProfileId || !isInteractiveActive) return;
-      const rect = screenImg.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
 
-      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-        return;
-      }
-
-      const xPercent = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
-      const yPercent = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+      const coords = getNormalizedCoordinates(screenImg, clientX, clientY);
+      if (!coords) return;
 
       if (ripple) {
-        ripple.style.left = `${clientX - rect.left + screenImg.offsetLeft}px`;
-        ripple.style.top = `${clientY - rect.top + screenImg.offsetTop}px`;
+        ripple.style.left = `${coords.localX}px`;
+        ripple.style.top = `${coords.localY}px`;
         ripple.style.opacity = '1';
         ripple.style.transform = 'translate(-50%, -50%) scale(1.5)';
         setTimeout(() => {
@@ -1902,21 +2254,193 @@ function setupModals() {
         }, 300);
       }
 
+      // Tự động bật bàn phím ảo điện thoại hoặc trỏ phím máy tính
+      const modalDirectKey = document.getElementById('interactiveDirectKeyReceiver');
+      if (modalDirectKey) modalDirectKey.focus();
+      screenWrapper.focus();
+
       try {
-        await window.electronAPI.interactClick(selectedProfileId, { xPercent, yPercent });
+        await window.electronAPI.interactClick(selectedProfileId, { xPercent: coords.xPercent, yPercent: coords.yPercent });
         setTimeout(() => {
-          const timestamp = Date.now();
-          screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-        }, 700);
+          if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }, 180);
       } catch (err) {
         console.error('[Touch Error]', err);
       }
     };
 
     screenWrapper.addEventListener('click', handleScreenClick);
+
+    // Bắt phím trực tiếp từ bàn phím vào modal
+    const modalDirectKey = document.getElementById('interactiveDirectKeyReceiver');
+    if (modalDirectKey) {
+      modalDirectKey.addEventListener('input', async () => {
+        if (!selectedProfileId || !isInteractiveActive) return;
+        const text = modalDirectKey.value;
+        if (!text) return;
+        modalDirectKey.value = '';
+        try {
+          await window.electronAPI.interactType(selectedProfileId, { text, pressEnter: false });
+          setTimeout(() => {
+            if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }, 180);
+        } catch(e) {}
+      });
+
+      modalDirectKey.addEventListener('keydown', async (e) => {
+        if (!selectedProfileId || !isInteractiveActive) return;
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
+          setTimeout(() => {
+            if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }, 250);
+        } else if (e.key === 'Backspace' && modalDirectKey.value.length === 0) {
+          e.preventDefault();
+          await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+          setTimeout(() => {
+            if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+          }, 180);
+        }
+      });
+    }
+
+    screenWrapper.addEventListener('keydown', async (e) => {
+      if (!selectedProfileId || !isInteractiveActive) return;
+      if (document.activeElement === modalDirectKey) return;
+      if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') && document.activeElement.id !== 'interactiveDirectKeyReceiver') {
+        return;
+      }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
+        setTimeout(() => {
+          if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }, 250);
+      } else if (e.key === 'Backspace') {
+        e.preventDefault();
+        await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+        setTimeout(() => {
+          if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }, 180);
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        await window.electronAPI.interactType(selectedProfileId, { text: e.key, pressEnter: false });
+        setTimeout(() => {
+          if (screenImg && selectedProfileId) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+        }, 180);
+      }
+    });
   }
 
-  // Gửi chữ vào ô nhập
+  // --- DRAWER ĐIỀN NHANH EMAIL & PASS ---
+  document.getElementById('btnToggleQuickFillDrawer')?.addEventListener('click', () => {
+    const drawer = document.getElementById('drawerQuickFill');
+    if (drawer) {
+      drawer.style.display = drawer.style.display === 'none' ? 'block' : 'none';
+      if (drawer.style.display === 'block') {
+        const d2 = document.getElementById('drawer2FA');
+        const dk = document.getElementById('drawerKeyboard');
+        if (d2) d2.style.display = 'none';
+        if (dk) dk.style.display = 'none';
+        document.getElementById('inputAutoFillUser')?.focus();
+      }
+    }
+  });
+
+  document.getElementById('btnCloseQuickFillDrawer')?.addEventListener('click', () => {
+    const d = document.getElementById('drawerQuickFill');
+    if (d) d.style.display = 'none';
+  });
+
+  document.getElementById('btnSubmitAutoFill')?.addEventListener('click', async () => {
+    const username = document.getElementById('inputAutoFillUser').value.trim();
+    const password = document.getElementById('inputAutoFillPass').value;
+    if (!username || !password) {
+      alert('Vui lòng nhập Email / SĐT và Mật khẩu!');
+      return;
+    }
+    const btn = document.getElementById('btnSubmitAutoFill');
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang điền...';
+
+    try {
+      await window.electronAPI.interactQuickFill(selectedProfileId, { username, password });
+      const d = document.getElementById('drawerQuickFill');
+      if (d) d.style.display = 'none';
+      setTimeout(() => {
+        const img = document.getElementById('imgInteractiveScreen');
+        if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }, 500);
+    } catch(err) {
+      alert('Lỗi tự động điền: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🚀 Điền & Bấm Đăng Nhập';
+    }
+  });
+
+  // --- DRAWER NHẬP MÃ 2FA ---
+  document.getElementById('btnToggle2FADrawer')?.addEventListener('click', () => {
+    const drawer = document.getElementById('drawer2FA');
+    if (drawer) {
+      drawer.style.display = drawer.style.display === 'none' ? 'block' : 'none';
+      if (drawer.style.display === 'block') {
+        const dq = document.getElementById('drawerQuickFill');
+        const dk = document.getElementById('drawerKeyboard');
+        if (dq) dq.style.display = 'none';
+        if (dk) dk.style.display = 'none';
+        document.getElementById('inputAutoFill2FA')?.focus();
+      }
+    }
+  });
+
+  document.getElementById('btnClose2FADrawer')?.addEventListener('click', () => {
+    const d = document.getElementById('drawer2FA');
+    if (d) d.style.display = 'none';
+  });
+
+  document.getElementById('btnSubmitAuto2FA')?.addEventListener('click', async () => {
+    const code = document.getElementById('inputAutoFill2FA').value.trim();
+    if (!code) {
+      alert('Vui lòng nhập mã 6 số!');
+      return;
+    }
+    const btn = document.getElementById('btnSubmitAuto2FA');
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang gửi...';
+
+    try {
+      await window.electronAPI.interactFill2FA(selectedProfileId, { code });
+      const d = document.getElementById('drawer2FA');
+      if (d) d.style.display = 'none';
+      setTimeout(() => {
+        const img = document.getElementById('imgInteractiveScreen');
+        if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }, 500);
+    } catch (err) {
+      alert('Lỗi gửi mã 2FA: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✓ Xác Nhận Mã';
+    }
+  });
+
+  // --- DRAWER BÀN PHÍM / GÕ CHỮ ---
+  document.getElementById('btnToggleKeyDrawer')?.addEventListener('click', () => {
+    const drawer = document.getElementById('drawerKeyboard');
+    if (drawer) {
+      drawer.style.display = drawer.style.display === 'none' ? 'block' : 'none';
+      if (drawer.style.display === 'block') {
+        const dq = document.getElementById('drawerQuickFill');
+        const d2 = document.getElementById('drawer2FA');
+        if (dq) dq.style.display = 'none';
+        if (d2) d2.style.display = 'none';
+        document.getElementById('inputInteractiveType')?.focus();
+      }
+    }
+  });
+
   const sendInteractiveText = async () => {
     const input = document.getElementById('inputInteractiveType');
     if (!input || !selectedProfileId) return;
@@ -1926,12 +2450,11 @@ function setupModals() {
     try {
       await window.electronAPI.interactType(selectedProfileId, { text, pressEnter: false });
       setTimeout(() => {
-        const timestamp = Date.now();
         const screenImg = document.getElementById('imgInteractiveScreen');
-        if (screenImg) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
-      }, 600);
+        if (screenImg) screenImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${Date.now()}`;
+      }, 350);
     } catch (err) {
-      alert('Lỗi gõ chữ: ' + err.message);
+      alert('Lỗi: ' + err.message);
     }
   };
 
@@ -1975,15 +2498,15 @@ function setupModals() {
     }, 500);
   });
 
-  // Hoàn tất và Đồng bộ
-  document.getElementById('btnInteractiveFinishSync')?.addEventListener('click', async () => {
+  // Nút Đồng bộ bằng tay nếu muốn
+  document.getElementById('btnInteractiveForceSync')?.addEventListener('click', async () => {
     if (!selectedProfileId) return;
-    const btn = document.getElementById('btnInteractiveFinishSync');
+    const btn = document.getElementById('btnInteractiveForceSync');
     btn.disabled = true;
-    btn.textContent = '⏳ Đang đồng bộ thông tin tài khoản...';
+    btn.textContent = '⏳ Đang đồng bộ...';
 
     try {
-      appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `Đang trích xuất UID, Tên, Avatar và Cookie sau khi duyệt đăng nhập...`, type: 'info' });
+      appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `Đang trích xuất UID, Tên, Avatar và Cookie...`, type: 'info' });
       const res = await window.electronAPI.fetchApiSession(selectedProfileId);
       if (res.success && res.isLoggedIn) {
         alert(`🎉 ĐỒNG BỘ THÀNH CÔNG!\nChào mừng ${res.name || 'Facebook'} (UID: ${res.uid || ''})`);
@@ -1997,36 +2520,69 @@ function setupModals() {
       alert('Lỗi: ' + err.message);
     } finally {
       btn.disabled = false;
-      btn.textContent = '🎉 ĐÃ DUYỆT XONG - ĐỒNG BỘ TÀI KHOẢN NGAY';
+      btn.textContent = '🎉 Đồng Bộ Ngay';
     }
   });
 
-  // === MODAL: BOOKMARKLET GUIDE CHO CHROME/SAFARI ĐIỆN THOẠI ===
-  const modalBm = document.getElementById('modalBookmarkletGuide');
-  window.openBookmarkletModal = (profileId) => {
-    const origin = window.location.origin;
-    const code = `javascript:(function(){const c=document.cookie;if(!c||!c.includes('c_user')){alert('Bạn chưa đăng nhập Facebook trên tab này!');return;}location.href='${origin}/api/cookie-import?profileId=${profileId}&cookie='+encodeURIComponent(c);})();`;
-    const txt = document.getElementById('txtBookmarkletCode');
-    if (txt) txt.value = code;
-    modalBm?.classList.add('active');
+  // === CÁCH 2: MỞ CHROME ĐIỆN THOẠI & PHÊ DUYỆT THIẾT BỊ ===
+  const modalChrome = document.getElementById('modalChromeSync');
+  window.openChromeSyncModal = (profileId) => {
+    selectedProfileId = profileId;
+    modalChrome?.classList.add('active');
   };
 
-  document.getElementById('btnOpenPhoneBookmarkletModal')?.addEventListener('click', () => {
-    if (selectedProfileId) openBookmarkletModal(selectedProfileId);
+  document.getElementById('btnCloseChromeSyncModal')?.addEventListener('click', () => modalChrome?.classList.remove('active'));
+  document.getElementById('btnDismissChromeSync')?.addEventListener('click', () => modalChrome?.classList.remove('active'));
+
+  document.getElementById('btnOpenChromeFbTab')?.addEventListener('click', () => {
+    window.open('https://m.facebook.com', '_blank');
   });
 
-  document.getElementById('btnCloseBookmarkletModal')?.addEventListener('click', () => modalBm?.classList.remove('active'));
-  document.getElementById('btnDismissBookmarklet')?.addEventListener('click', () => modalBm?.classList.remove('active'));
+  document.getElementById('btnConfirmChromeSync')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    const btn = document.getElementById('btnConfirmChromeSync');
+    btn.disabled = true;
+    btn.textContent = '⏳ Đang kiểm tra phiên đăng nhập...';
 
-  document.getElementById('btnCopyBookmarklet')?.addEventListener('click', () => {
-    const txt = document.getElementById('txtBookmarkletCode');
-    if (txt) {
-      txt.select();
-      navigator.clipboard.writeText(txt.value).then(() => {
-        alert('Đã sao chép mã 1 chạm! Anh hãy mở tab m.facebook.com trên Chrome/Safari điện thoại, đăng nhập rồi dán mã này vào thanh địa chỉ nhé!');
-      }).catch(() => {
-        alert('Vui lòng chọn toàn bộ văn bản và sao chép thủ công.');
-      });
+    try {
+      const res = await window.electronAPI.fetchApiSession(selectedProfileId);
+      if (res.success && res.isLoggedIn) {
+        alert(`🎉 ĐỒNG BỘ THÀNH CÔNG!\nChào mừng ${res.name || 'Facebook'} (UID: ${res.uid || ''})`);
+        modalChrome?.classList.remove('active');
+        await loadProfiles();
+      } else {
+        alert('⚠️ Chưa phát hiện phiên đăng nhập Facebook hợp lệ trên máy tính.\n\nNếu anh vừa đăng nhập trên Chrome điện thoại, hãy đảm bảo tài khoản đã vào Bảng tin hoặc dùng Cách 1 (Khung Trình Duyệt Trực Tiếp) để tự động bắt nhé!\n\nChi tiết: ' + (res.message || ''));
+      }
+    } catch (err) {
+      alert('Lỗi kiểm tra: ' + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 Kiểm Tra & Hoàn Tất Đồng Bộ API';
+    }
+  });
+
+  document.getElementById('toggleManualCookieInput')?.addEventListener('click', () => {
+    const box = document.getElementById('manualCookieBox');
+    if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('btnSubmitManualCookie')?.addEventListener('click', async () => {
+    const cookie = document.getElementById('inputManualCookie').value.trim();
+    if (!cookie) {
+      alert('Vui lòng dán chuỗi Cookie!');
+      return;
+    }
+    try {
+      const res = await window.electronAPI.importCookieSession(selectedProfileId, cookie);
+      if (res.isLoggedIn) {
+        alert(`🎉 ĐỒNG BỘ COOKIE THÀNH CÔNG!\nChào mừng ${res.name || 'Facebook'} (UID: ${res.uid || ''})`);
+        modalChrome?.classList.remove('active');
+        await loadProfiles();
+      } else {
+        alert('⚠️ ' + (res.message || 'Cookie không hợp lệ'));
+      }
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
     }
   });
 

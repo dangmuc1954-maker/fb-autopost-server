@@ -304,6 +304,38 @@ app.post('/api/profiles/:id/interactive/navigate', async (req, res) => {
   }
 });
 
+// Kiểm tra trạng thái đăng nhập thời gian thực
+app.get('/api/profiles/:id/interactive/status', async (req, res) => {
+  try {
+    const result = await browserHub.checkSessionStatus(req.params.id);
+    res.json({ success: true, ...result });
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Điền nhanh tài khoản mật khẩu
+app.post('/api/profiles/:id/interactive/quick-fill', async (req, res) => {
+  try {
+    const { username = '', password = '' } = req.body || {};
+    const result = await browserHub.interactQuickFill(req.params.id, { username, password });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
+// Điền mã 2FA
+app.post('/api/profiles/:id/interactive/fill-2fa', async (req, res) => {
+  try {
+    const { code = '' } = req.body || {};
+    const result = await browserHub.interactFill2FA(req.params.id, { code });
+    res.json(result);
+  } catch (err) {
+    res.json({ success: false, error: err.message });
+  }
+});
+
 // Lấy cookie từ Bookmarklet trên điện thoại (Direct import từ Safari/Chrome Mobile)
 app.get('/api/cookie-import', async (req, res) => {
   try {

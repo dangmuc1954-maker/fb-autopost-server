@@ -99,6 +99,11 @@ class BrowserHub {
       args: launchArgs
     };
 
+    if (options.isMobile) {
+      launchOptions.isMobile = true;
+      launchOptions.hasTouch = true;
+    }
+
     if (options.userAgent) {
       launchOptions.userAgent = options.userAgent;
     }
@@ -114,6 +119,14 @@ class BrowserHub {
 
     try {
       const context = await chromium.launchPersistentContext(profileDir, launchOptions);
+      
+      // Che giấu dấu vết automation chống checkpoint Facebook
+      await context.addInitScript(() => {
+        try {
+          Object.defineProperty(navigator, 'webdriver', { get: () => undefined });
+        } catch(e) {}
+      });
+
       const pages = context.pages();
       const page = pages.length > 0 ? pages[0] : await context.newPage();
 
@@ -719,6 +732,8 @@ class BrowserHub {
         }
       }
     }
+  }
+
   // --- KHỞI CHẠY PHIÊN TRÌNH DUYỆT TƯƠNG TÁC CHO ĐIỆN THOẠI (REMOTE CLOUD BROWSER) ---
   async startInteractiveSession(profileId, { url = 'https://m.facebook.com/login.php', isMobile = true } = {}) {
     const profile = db.getProfile(profileId);
@@ -765,34 +780,35 @@ class BrowserHub {
     const realY = Math.round((yPercent / 100) * vp.height);
 
     await page.mouse.click(realX, realY);
-    await new Promise(r => setTimeout(r, 600));
     return { success: true, url: page.url() };
   }
 
-  // Nhập văn bản vào ô đang focus
+  // Nhập văn bản trực tiếp vào ô đang focus (hỗ trợ Unicode tiếng Việt, gõ phím tức thì)
   async interactType(profileId, { text = '', pressEnter = false }) {
     const active = this.activeContexts.get(profileId);
     if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
 
     const page = active.page;
     if (text) {
-      await page.keyboard.type(text, { delay: 40 });
+      try {
+        await page.keyboard.insertText(text);
+      } catch (e) {
+        await page.keyboard.type(text, { delay: 10 });
+      }
     }
     if (pressEnter) {
       await page.keyboard.press('Enter');
     }
-    await new Promise(r => setTimeout(r, 600));
     return { success: true, url: page.url() };
   }
 
-  // Nhấn phím
+  // Nhấn phím điều hướng, phím tắt hoặc Enter / Backspace
   async interactKey(profileId, { key = 'Enter' }) {
     const active = this.activeContexts.get(profileId);
     if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
 
     const page = active.page;
     await page.keyboard.press(key);
-    await new Promise(r => setTimeout(r, 600));
     return { success: true, url: page.url() };
   }
 
@@ -803,7 +819,6 @@ class BrowserHub {
 
     const page = active.page;
     await page.mouse.wheel(0, deltaY);
-    await new Promise(r => setTimeout(r, 400));
     return { success: true, url: page.url() };
   }
 
@@ -814,6 +829,100 @@ class BrowserHub {
 
     const page = active.page;
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 35000 });
+    return { success: true, url: page.url() };
+  }
+
+  // Kiểm tra trạng thái đăng nhập thời gian thực (để tự động đồng bộ API)
+  async checkSessionStatus(profileId) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page || !active.context) {
+      return { isOpen: false, isLoggedIn: false, uid: '', url: '' };
+    }
+    const page = active.page;
+    const context = active.context;
+    const currentUrl = page.url() || '';
+
+    let isLoggedIn = false;
+    let uid = '';
+    try {
+      const cookies = await context.cookies(['https://www.facebook.com', 'https://m.facebook.com']);
+      const cUser = cookies.find(c => c.name === 'c_user');
+      const xs = cookies.find(c => c.name === 'xs');
+      if (cUser && cUser.value && xs && xs.value) {
+        isLoggedIn = true;
+        uid = cUser.value;
+      }
+    } catch (e) {}
+
+    return {
+      isOpen: true,
+      isLoggedIn,
+      uid,
+      url: currentUrl
+    };
+  }
+
+  // Điền nhanh Email/SĐT và Mật khẩu tự động trên màn hình m.facebook.com
+  async interactQuickFill(profileId, { username = '', password = '' } = {}) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    this.log(`Đang tự động điền tài khoản [${username}] trên màn hình di động...`, 'info');
+
+    // Các selector phổ biến trên m.facebook.com và facebook.com
+    const emailSelector = 'input[name="email"], #m_login_email, #email, input[type="text"], input[type="email"]';
+    const passSelector = 'input[name="pass"], #m_login_password, #pass, input[type="password"]';
+
+    await page.waitForSelector(emailSelector, { timeout: 6000 }).catch(() => {});
+    const emailInput = await page.$(emailSelector);
+    if (emailInput && username) {
+      await emailInput.fill(username.trim());
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    const passInput = await page.$(passSelector);
+    if (passInput && password) {
+      await passInput.fill(password);
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    // Bấm nút đăng nhập
+    const submitBtn = await page.$('button[name="login"], button[type="submit"], input[type="submit"], button:has-text("Đăng nhập"), button:has-text("Log In"), button:has-text("Tiếp tục")');
+    if (submitBtn) {
+      await submitBtn.click();
+    } else if (passInput) {
+      await passInput.press('Enter');
+    }
+
+    await new Promise(r => setTimeout(r, 1800));
+    return { success: true, url: page.url() };
+  }
+
+  // Điền nhanh mã 2FA tự động trên màn hình
+  async interactFill2FA(profileId, { code = '' } = {}) {
+    const active = this.activeContexts.get(profileId);
+    if (!active || !active.page) throw new Error('Trình duyệt chưa mở phiên nào');
+
+    const page = active.page;
+    this.log(`Đang tự động điền mã 2FA [${code}] trên màn hình...`, 'info');
+
+    const codeSelector = 'input[name="approvals_code"], #approvals_code, input[inputmode="numeric"], input[type="number"], input[type="text"]';
+    await page.waitForSelector(codeSelector, { timeout: 6000 }).catch(() => {});
+    const codeInput = await page.$(codeSelector);
+    if (codeInput && code) {
+      await codeInput.fill(code.trim());
+      await new Promise(r => setTimeout(r, 300));
+    }
+
+    const submitBtn = await page.$('#checkpointSubmitButton, button[type="submit"], button:has-text("Gửi mã"), button:has-text("Tiếp tục"), button:has-text("Continue"), button:has-text("Submit")');
+    if (submitBtn) {
+      await submitBtn.click();
+    } else if (codeInput) {
+      await codeInput.press('Enter');
+    }
+
+    await new Promise(r => setTimeout(r, 2000));
     return { success: true, url: page.url() };
   }
 }
