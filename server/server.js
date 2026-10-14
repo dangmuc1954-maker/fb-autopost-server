@@ -207,6 +207,31 @@ app.post('/api/profiles/:id/login', async (req, res) => {
   }
 });
 
+// Chụp ảnh màn hình trực tiếp của trình duyệt (xem trên điện thoại)
+app.get('/api/profiles/:id/screenshot', async (req, res) => {
+  try {
+    let active = browserHub.getActiveContext(req.params.id);
+    let shouldClose = false;
+    if (!active || !active.page) {
+      await browserHub.openBrowser(req.params.id, { headless: true, skipNavigation: true });
+      active = browserHub.getActiveContext(req.params.id);
+      shouldClose = true;
+    }
+    if (!active || !active.page) {
+      return res.status(404).json({ success: false, message: 'Trình duyệt chưa mở' });
+    }
+    const buffer = await active.page.screenshot({ type: 'jpeg', quality: 75 });
+    if (shouldClose) {
+      await browserHub.closeBrowser(req.params.id).catch(() => {});
+    }
+    res.set('Content-Type', 'image/jpeg');
+    res.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    res.send(buffer);
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // 2. Quản lý Kho bài viết (Posts)
 app.get('/api/posts', (req, res) => {
   res.json(db.getPosts());

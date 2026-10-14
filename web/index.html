@@ -110,17 +110,17 @@
                 <span id="currentAccountHeaderStatus" class="status-pill not-logged">Chưa kết nối</span>
               </h4>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button class="btn btn-primary btn-sm" id="btnHubPhoneLogin" title="Đăng nhập trực tiếp trên điện thoại để lấy API và đồng bộ">
+                  <span>📱 Đăng Nhập Trên Điện Thoại</span>
+                </button>
                 <button class="btn btn-cyan btn-sm" id="btnHubSyncGroups">
                   <span>⚡ Quét Nhóm Đã Tham Gia</span>
                 </button>
-                <button class="btn btn-primary btn-sm" id="btnHubOpenBrowser">
-                  <span>Mở Trình Duyệt</span>
+                <button class="btn btn-secondary btn-sm" id="btnHubOpenBrowser" title="Chỉ dùng khi bạn đang ngồi trước màn hình máy tính chủ để mở cửa sổ Chrome">
+                  <span>🖥️ Mở Chrome Trên PC</span>
                 </button>
                 <button class="btn btn-secondary btn-sm" id="btnHubCloseBrowser" style="display: none;">
                   <span>Đóng Trình Duyệt</span>
-                </button>
-                <button class="btn btn-secondary btn-sm" id="btnHubQuickLogin" title="Đăng nhập tự động bằng Email/Pass trên Cloud hoặc điện thoại">
-                  <span>🚀 Đăng Nhập Nhanh</span>
                 </button>
               </div>
             </div>
@@ -226,11 +226,14 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn btn-primary btn-full" id="btnInspectorPhoneLogin" style="font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
+                <span>📱 Đăng Nhập Trên Điện Thoại</span>
+              </button>
               <button class="btn btn-cyan btn-full" id="btnInspectorSync">
                 <span>⚡ Quét Nhóm Đã Tham Gia</span>
               </button>
-              <button class="btn btn-secondary btn-full" id="btnInspectorOpenFB">
-                <span>🌐 Mở Facebook Trực Tiếp</span>
+              <button class="btn btn-secondary btn-full" id="btnInspectorLiveScreen">
+                <span>👁️ Xem Màn Hình Trình Duyệt</span>
               </button>
             </div>
 
@@ -609,6 +612,15 @@
                 Nạp Cookie & Đồng Bộ Ngay
               </button>
             </div>
+          <div style="margin-top: 14px; text-align: center;">
+            <a href="javascript:void(0)" id="toggleQuickScreenshot" style="font-size: 11.5px; color: var(--accent-cyan); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+              <span>👁️ Xem ảnh màn hình đăng nhập từ server</span>
+            </a>
+            <div id="quickScreenshotContainer" style="display: none; margin-top: 10px; background: #070a12; border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 8px; text-align: center;">
+              <img id="quickScreenshotImg" src="" style="max-width: 100%; border-radius: 4px; display: none;" alt="Màn hình FB">
+              <div id="quickScreenshotLoading" style="color: var(--text-dim); font-size: 11px; padding: 20px;">Đang tải ảnh màn hình...</div>
+              <button class="btn btn-secondary btn-sm" id="btnRefreshQuickScreenshot" style="margin-top: 6px; font-size: 11px;">🔄 Làm mới ảnh màn hình</button>
+            </div>
           </div>
         </div>
 
@@ -628,6 +640,33 @@
               ✓ Xác Nhận Mã 2FA
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: XEM MÀN HÌNH TRÌNH DUYỆT TRỰC TIẾP (CHO ĐIỆN THOẠI) -->
+  <div class="modal-overlay" id="modalLiveScreen">
+    <div class="modal-box" style="max-width: 580px; width: 95%;">
+      <div class="modal-header">
+        <h3 id="modalLiveScreenTitle">👁️ Màn Hình Trình Duyệt Facebook</h3>
+        <button class="modal-close" id="btnCloseLiveScreenModal">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center;">
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+          Ảnh chụp trực tiếp từ phiên Facebook đang chạy trên server. Anh có thể xem để biết tài khoản đã đăng nhập thành công hay đang ở màn hình xác minh/2FA.
+        </p>
+        <div style="min-height: 220px; background: #070a12; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+          <img id="imgLiveScreenPreview" src="" alt="Facebook Screen" style="max-width: 100%; height: auto; display: none; border-radius: 6px;">
+          <div id="liveScreenStatusText" style="color: var(--accent-cyan); font-size: 12px; font-weight: 600; padding: 20px;">
+            ⏳ Đang tải ảnh màn hình từ server...
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center; margin-top: 14px;">
+          <span id="liveScreenTimeText" style="font-size: 11px; color: var(--text-muted);">Cập nhật: Vừa xong</span>
+          <button class="btn btn-cyan btn-sm" id="btnRefreshLiveScreen">
+            🔄 Làm Mới Màn Hình
+          </button>
         </div>
       </div>
     </div>

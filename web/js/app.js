@@ -582,21 +582,33 @@ function setupHubControls() {
     document.querySelectorAll('.hub-group-cb, .hub-group-cb-table').forEach(cb => cb.checked = false);
   });
 
-  // Mở trình duyệt Chrome
+  // Mở trình duyệt Chrome trên PC/Server
   document.getElementById('btnHubOpenBrowser')?.addEventListener('click', async () => {
-    if (!selectedProfileId) return;
+    if (!selectedProfileId) {
+      alert('Vui lòng chọn tài khoản Facebook trước!');
+      return;
+    }
+    const isMobile = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (isMobile) {
+      const wantPc = confirm(
+        '📱 LƯU Ý KHI DÙNG TRÊN ĐIỆN THOẠI:\n\n' +
+        'Lệnh này sẽ mở cửa sổ Google Chrome trên MÀN HÌNH MÁY TÍNH CHỦ (Server/PC), KHÔNG THỂ mở cửa sổ ứng dụng riêng trên điện thoại được do cơ chế bảo mật của hệ điều hành.\n\n' +
+        '👉 Để đăng nhập tiện lợi ngay trên điện thoại, anh nên dùng nút "📱 Đăng Nhập Trên Điện Thoại" (nhập Email/Pass hoặc dán Cookie) để tool tự động đăng nhập ngầm!\n\n' +
+        'Anh vẫn muốn máy tính chủ mở Chrome chứ?'
+      );
+      if (!wantPc) {
+        handleOpenPhoneLogin();
+        return;
+      }
+    }
     try {
-      appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `Đang gửi lệnh mở trình duyệt...`, type: 'info' });
+      appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `Đang gửi lệnh mở Chrome trên PC/Máy chủ...`, type: 'info' });
       const res = await window.electronAPI.openBrowser(selectedProfileId, { headless: false });
-      alert('Đã gửi lệnh mở trình duyệt thành công!');
+      alert('Đã gửi lệnh mở trình duyệt thành công trên máy tính!');
       await loadProfiles();
     } catch (e) {
       alert('Lỗi: ' + e.message);
     }
-  });
-
-  document.getElementById('btnInspectorOpenFB')?.addEventListener('click', async () => {
-    document.getElementById('btnHubOpenBrowser')?.click();
   });
 
   // Đóng trình duyệt
@@ -648,18 +660,72 @@ function setupHubControls() {
     }
   });
 
-  // Nút mở modal Đăng nhập nhanh
-  document.getElementById('btnHubQuickLogin')?.addEventListener('click', () => {
+  // ĐĂNG NHẬP TRÊN ĐIỆN THOẠI (QUICK LOGIN MODAL)
+  const handleOpenPhoneLogin = () => {
+    if (!selectedProfileId) {
+      alert('Vui lòng chọn một tài khoản Facebook trước!');
+      return;
+    }
+    openQuickLoginModal(selectedProfileId);
+  };
+
+  document.getElementById('btnHubPhoneLogin')?.addEventListener('click', handleOpenPhoneLogin);
+  document.getElementById('btnInspectorPhoneLogin')?.addEventListener('click', handleOpenPhoneLogin);
+  document.getElementById('btnHubQuickLogin')?.addEventListener('click', handleOpenPhoneLogin);
+  document.getElementById('btnHubOpenLoginModal')?.addEventListener('click', handleOpenPhoneLogin);
+
+  // XEM MÀN HÌNH TRÌNH DUYỆT TRỰC TIẾP (LIVE SCREEN CHO ĐIỆN THOẠI)
+  const modalLive = document.getElementById('modalLiveScreen');
+  const imgLive = document.getElementById('imgLiveScreenPreview');
+  const liveStatus = document.getElementById('liveScreenStatusText');
+  const liveTime = document.getElementById('liveScreenTimeText');
+
+  const refreshLiveScreenshot = () => {
+    if (!selectedProfileId) return;
+    if (liveStatus) {
+      liveStatus.style.display = 'block';
+      liveStatus.textContent = '⏳ Đang tải ảnh màn hình từ server...';
+    }
+    if (imgLive) imgLive.style.display = 'none';
+
+    const timestamp = Date.now();
+    const imgUrl = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+    const imgTest = new Image();
+    imgTest.onload = () => {
+      if (imgLive) {
+        imgLive.src = imgUrl;
+        imgLive.style.display = 'block';
+      }
+      if (liveStatus) liveStatus.style.display = 'none';
+      if (liveTime) liveTime.textContent = `Cập nhật: ${new Date().toLocaleTimeString('vi-VN')}`;
+    };
+    imgTest.onerror = () => {
+      if (liveStatus) {
+        liveStatus.style.display = 'block';
+        liveStatus.textContent = '⚠️ Trình duyệt chưa mở hoặc chưa chụp được màn hình. Vui lòng bấm Đăng Nhập trước!';
+      }
+    };
+    imgTest.src = imgUrl;
+  };
+
+  document.getElementById('btnInspectorLiveScreen')?.addEventListener('click', () => {
     if (!selectedProfileId) {
       alert('Vui lòng chọn một tài khoản trước!');
       return;
     }
-    openQuickLoginModal(selectedProfileId);
+    const p = currentProfiles.find(item => item.id === selectedProfileId);
+    const titleEl = document.getElementById('modalLiveScreenTitle');
+    if (titleEl) titleEl.textContent = `👁️ Màn Hình Trình Duyệt [${p ? p.name : ''}]`;
+    modalLive?.classList.add('active');
+    refreshLiveScreenshot();
   });
 
-  document.getElementById('btnHubOpenLoginModal')?.addEventListener('click', () => {
-    if (!selectedProfileId) return;
-    openQuickLoginModal(selectedProfileId);
+  document.getElementById('btnCloseLiveScreenModal')?.addEventListener('click', () => {
+    modalLive?.classList.remove('active');
+  });
+
+  document.getElementById('btnRefreshLiveScreen')?.addEventListener('click', () => {
+    refreshLiveScreenshot();
   });
 
   // Lưu chi tiết (Proxy, Note)
@@ -1326,6 +1392,44 @@ function setupModals() {
     const box = document.getElementById('quickCookieBox');
     if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
   });
+
+  const loadQuickScreenshot = () => {
+    if (!activeQuickLoginProfileId) return;
+    const img = document.getElementById('quickScreenshotImg');
+    const loading = document.getElementById('quickScreenshotLoading');
+    if (loading) {
+      loading.style.display = 'block';
+      loading.textContent = '⏳ Đang tải ảnh màn hình từ server...';
+    }
+    if (img) img.style.display = 'none';
+
+    const timestamp = Date.now();
+    const url = `/api/profiles/${activeQuickLoginProfileId}/screenshot?t=${timestamp}`;
+    const testImg = new Image();
+    testImg.onload = () => {
+      if (img) {
+        img.src = url;
+        img.style.display = 'block';
+      }
+      if (loading) loading.style.display = 'none';
+    };
+    testImg.onerror = () => {
+      if (loading) loading.textContent = 'Chưa có ảnh (Trình duyệt chưa mở phiên nào).';
+    };
+    testImg.src = url;
+  };
+
+  document.getElementById('toggleQuickScreenshot')?.addEventListener('click', () => {
+    const container = document.getElementById('quickScreenshotContainer');
+    if (!container) return;
+    const isHidden = container.style.display === 'none';
+    container.style.display = isHidden ? 'block' : 'none';
+    if (isHidden) {
+      loadQuickScreenshot();
+    }
+  });
+
+  document.getElementById('btnRefreshQuickScreenshot')?.addEventListener('click', loadQuickScreenshot);
 
   // Submit Login Email/Pass
   document.getElementById('btnSubmitQuickLogin')?.addEventListener('click', async () => {

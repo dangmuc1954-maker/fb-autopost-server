@@ -2,15 +2,272 @@
   "profiles": [
     {
       "id": "prof_1791910286130_auy4c",
-      "name": "Nick Facebook 1",
-      "uid": "",
-      "avatar": "",
+      "name": "Linh Phương Võ",
+      "uid": "61592499600015",
+      "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-1/758617458_122096430303416653_5593617949531328326_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx1143x1144&ctp=s40x40&_nc_cat=107&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=1d2534&_nc_ohc=9z2sKEFTmwIQ7kNvwF1fj2O&_nc_oc=Adq0K5ttvrrotY6vLIUdYNfRydkXtjz0AP4AvH0kqIKtaVPiUw13D03oPu51086Vmkz4WdAwANOhcnMDM_SpWsjw&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=v4Fu6EqjuFDBAP3udv0zjQ&_nc_ss=7b2a8&oh=00_AQOpfm9Oz6GqWNaYyGHz6qoOI7ScUP4fUvrWr3Tiblzf2w&oe=6AD4A25D",
       "proxy": "",
       "note": "",
-      "status": "ready",
-      "isLoggedIn": false,
-      "groups": [],
-      "lastSynced": null,
+      "status": "open",
+      "isLoggedIn": true,
+      "groups": [
+        {
+          "id": "1450430758632402",
+          "name": "CỘNG ĐỒNG LÀM VIDEO BẰNG AI 🎥",
+          "url": "https://www.facebook.com/groups/1450430758632402",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/832247104_122135554815172214_5903620346301137667_n.png?stp=c415.0.906.906a_cp0_dst-png&cstp=mx906x906&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=eSy3u7OW5WEQ7kNvwHPni52&_nc_oc=AdrBVZ8Jh9_jGFt3VJ3HyDqscFl-ItmjS8J9S3CdKsaKmDp9VRKsqtLltjK21nlqv4rQkDXTY86eWqnXGov41YKx&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQPhJwUV2FMGpzJUtFW9BbqKDAEDP9B0DXjmvNmszw3bWg&oe=6AD4AB12",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1335150193545289",
+          "name": "Làm Video Bằng AI ✅",
+          "url": "https://www.facebook.com/groups/1335150193545289",
+          "avatar": "https://scontent.fsgn2-7.fna.fbcdn.net/v/t39.30808-6/754308109_1041987355458900_2257081886145174257_n.png?stp=c567.0.809.809a_cp0_dst-png&cstp=mx809x809&ctp=s50x50&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=qWu2xryc5bcQ7kNvwFwE5dQ&_nc_oc=AdotBeyaBS8VOHJ_o2OWboeggTUgMr9KUeE2BABr-Dc1H2N2XKx2KR5FwOIUboeDNVKDWPA4CxQUOv0incbKOvg5&_nc_zt=23&_nc_ht=scontent.fsgn2-7.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQMPmdUBWC6OhkRyXK-rNvJs5Q6OvMzFpnL51fOm1nUjNQ&oe=6AD4A706",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1181391356304247",
+          "name": "Edit Capcut - Việc Làm Video Editor Tiktok",
+          "url": "https://www.facebook.com/groups/1181391356304247",
+          "avatar": "https://scontent.fsgn2-8.fna.fbcdn.net/v/t39.30808-6/488549624_122192561006111038_5867203893014652944_n.jpg?stp=c250.0.500.500a_cp0_dst-jpg_tt6&cstp=mx500x500&ctp=s50x50&_nc_cat=107&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=VIMbwF9xdWcQ7kNvwFqVgUE&_nc_oc=Adodd73MzBaKu1kun5ZN5HsmPvcdeJhflrctVq0YCfyUmzdTxivpCrRNdmzzh_sntfXRJw4MFbPkDR5yDgpp0yys&_nc_zt=23&_nc_ht=scontent.fsgn2-8.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQOQlTmikpEeaErbYBd5Iblac9lPSRQ2u7YjbXEtt1dQfQ&oe=6AD4BC8F",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1385451906420187",
+          "name": "Vibe Code kiếm cơm",
+          "url": "https://www.facebook.com/groups/1385451906420187",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/599201147_943422655516527_3207049423328120791_n.jpg?stp=c905.0.1333.1333a_cp0_dst-jpg_tt6&cstp=mx1333x1333&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=5PSxJsSVejEQ7kNvwE61twg&_nc_oc=AdpiR6oXWk_i8P1cSFYP_-GemxNIN1AnlpXw4O9USgiUf-MMze8LUXYNhtpxc9A2snyz3b2eptmcMtY6dmY143XD&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQMUC640pabonI-iNT13-Q-Q-VxuHU7w6GkCZY0fu2skXg&oe=6AD4B2DF",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1276401474622686",
+          "name": "Học Làm Video AI",
+          "url": "https://www.facebook.com/groups/1276401474622686",
+          "avatar": "https://scontent.fsgn2-8.fna.fbcdn.net/v/t39.30808-6/720721947_122130467601195385_6663570568248657471_n.jpg?stp=c288.0.384.384a_cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s50x50&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=YjDzmWVvBkEQ7kNvwFQP0tH&_nc_oc=AdrSbeDMOxjKTOwBgAK65MVH4SIqBDqpSylYUILYyAXllSeqAefr3UwXbqn8V0yqVAfiaZX4xqyzgEuzmWRuoCxr&_nc_zt=23&_nc_ht=scontent.fsgn2-8.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQNZbPzKKZl6wv1Lzq6B5yRhNB3IzLHpNKG4kic1q3FHlQ&oe=6AD4C86C",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "2974696786186867",
+          "name": "Lớp Học Edit CapCut",
+          "url": "https://www.facebook.com/groups/2974696786186867",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t1.6435-9/187583689_281483557047176_7029383292370246726_n.jpg?stp=c59.0.602.602a_cp0_dst-jpg_tt6&cstp=mx602x602&ctp=s50x50&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=4HNKo5JioN8Q7kNvwH29j_K&_nc_oc=AdqyP7c9y6xcpVF9dR4XwtVVcSgb2Qgq2fWRPRbI0yGXcsdNTV-2RgNG3_MbRrvgYnQT7OePq04ru1RT75PeAsEN&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQOQH47jZghxM_nWSWYyZAI0EDSi56V7Q_rRxyL1rmkIzA&oe=6AF66C74",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "vieclamvideoeditortiktok",
+          "name": "Edit Capcut - Việc Làm Video Editor Tiktok",
+          "url": "https://www.facebook.com/groups/vieclamvideoeditortiktok",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/116687302_959241714549285_318408173653384421_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s48x48&_nc_cat=1&ccb=1-7&_nc_sid=100df4&_nc_ohc=Ek_B6rF2GbUQ7kNvwFk73R0&_nc_oc=Adp7pNF2qer7Sj-fLdnnTlIA1h-lwVnZ0oUlPMT-Dy_ZiwLMcBfR56seVQQAN5VNoikAQl7iSwxPP6EHAVUu010G&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_ss=7b2a8&oh=00_AQOHew9NfaQICtbIFF2pAFiMxeYiGEH22-dI-MZREgNzWQ&oe=6AF63E03",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "vieclameditcapcut",
+          "name": "EDIT CAPCUT- VIỆC TÌM NGƯỜI, NGƯỜI TÌM VIỆC",
+          "url": "https://www.facebook.com/groups/vieclameditcapcut",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/116687302_959241714549285_318408173653384421_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s48x48&_nc_cat=1&ccb=1-7&_nc_sid=100df4&_nc_ohc=Ek_B6rF2GbUQ7kNvwFk73R0&_nc_oc=Adp7pNF2qer7Sj-fLdnnTlIA1h-lwVnZ0oUlPMT-Dy_ZiwLMcBfR56seVQQAN5VNoikAQl7iSwxPP6EHAVUu010G&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_ss=7b2a8&oh=00_AQOHew9NfaQICtbIFF2pAFiMxeYiGEH22-dI-MZREgNzWQ&oe=6AF63E03",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "25341422675531001",
+          "name": "Tài Khoản VEO 3 - Chia Sẻ Tài Liệu Làm Video VEO3 🚀",
+          "url": "https://www.facebook.com/groups/25341422675531001",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/116687302_959241714549285_318408173653384421_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s48x48&_nc_cat=1&ccb=1-7&_nc_sid=100df4&_nc_ohc=Ek_B6rF2GbUQ7kNvwFk73R0&_nc_oc=Adp7pNF2qer7Sj-fLdnnTlIA1h-lwVnZ0oUlPMT-Dy_ZiwLMcBfR56seVQQAN5VNoikAQl7iSwxPP6EHAVUu010G&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_ss=7b2a8&oh=00_AQOHew9NfaQICtbIFF2pAFiMxeYiGEH22-dI-MZREgNzWQ&oe=6AF63E03",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "945603251671521",
+          "name": "Antigravity VN",
+          "url": "https://www.facebook.com/groups/945603251671521",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/657735567_122105631045207853_3492867444305583705_n.webp?stp=c320.0.1280.1280a_cp0_dst-png&cstp=mx1280x1280&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=2V3JN9ztynEQ7kNvwHrnmVf&_nc_oc=AdqvFJc4dOOcPYw34DUTXu27itTAHmR8ajBx5y89xtBwyiVlTVF-70vnyUw_C3ZaHgHsKEIZjw8hyOHMFSJQkjCh&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQN8cqE5yHXQMliPpaFPl9AV27-dp0vVtG6SnYggzc-Jnw&oe=6AD4B2AE",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "hoichomevabe1",
+          "name": "Cộng Đồng Làm Video Bằng AI",
+          "url": "https://www.facebook.com/groups/hoichomevabe1",
+          "avatar": "https://scontent.fsgn2-5.fna.fbcdn.net/v/t39.30808-6/840264598_1132818469573763_1016863002841303468_n.png?stp=c646.0.765.765a_cp0_dst-png&cstp=mx765x765&ctp=s50x50&_nc_cat=110&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=BJNoNERDBF0Q7kNvwH7xcog&_nc_oc=AdqEG0kP3jjFDbyiANEOhihU4cwozAXfQ5TSB6TQ_apNXTGjjGjl5WJN5rE0uzqE0_VhmLNE_3CA9LXu5fv3nhte&_nc_zt=23&_nc_ht=scontent.fsgn2-5.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQOymVD9fcPLbPqzk-MOkVc5-ErcRphMMr_-vSeOxtLvwg&oe=6AD4CD06",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "Phununews",
+          "name": "LÀM VIDEO BẰNG AI ✅",
+          "url": "https://www.facebook.com/groups/Phununews",
+          "avatar": "https://scontent.fsgn2-8.fna.fbcdn.net/v/t39.30808-6/732197119_1725315181995046_3196188971369964902_n.png?stp=c626.0.776.776a_cp0_dst-png&cstp=mx776x776&ctp=s50x50&_nc_cat=111&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=xocWUAeDvQcQ7kNvwEJols1&_nc_oc=AdrsDevzqj0Jf1tBJogFcVWiKX8OBE3r3FhST_OsqmqZ4INEViaAHN2hbWIrVD5QVvrciiJUwHKnK_PjShxXDSxQ&_nc_zt=23&_nc_ht=scontent.fsgn2-8.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQOU5FAgBeFTuM-fdRststw4SoIPhCSA63TSmAceS5H4jA&oe=6AD4ABB7",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1372493020530375",
+          "name": "Code Tools MMO, Web, App theo yêu cầu",
+          "url": "https://www.facebook.com/groups/1372493020530375",
+          "avatar": "https://scontent.fsgn2-9.fna.fbcdn.net/v/t39.30808-6/605877968_4281545765390776_5767691270578984364_n.webp?stp=cp0_dst-png&cstp=mx1024x1024&ctp=s50x50&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=Diw8gjQqQYUQ7kNvwH6gPVg&_nc_oc=Adoil_7ZyA50qpsSPknLpkyovmsKqms1rqoXk9_SS6aZF872lTJIpFCyChVc2Zv8K6Xo3tqnWvbiDdKLSeWq00XK&_nc_zt=23&_nc_ht=scontent.fsgn2-9.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQPhiKxkb9HiaprpZw0W6fXUurFs_s1oagWq0jHGvayLJg&oe=6AD4D2B9",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1815173195819041",
+          "name": "NHẬN LÀM SLIDE THUYẾT TRÌNH CANVA-POWERPOINT THUÊ",
+          "url": "https://www.facebook.com/groups/1815173195819041",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/788060374_122104730607448744_1929921842958194152_n.jpg?stp=c346.0.691.691a_cp0_dst-jpg_tt6&cstp=mx691x691&ctp=s50x50&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=R0zt--QBXrwQ7kNvwG0sxlh&_nc_oc=Adq6QYo6smQM30MUeszhRwkanv_fE973Y2E3amwMvGIkkp95046QEpQXGTBfmvH9Upb_q-5lM7eeF-bt9CudXlGP&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQPVLOtAmRmuMSZAR5QbM3Mrnr7Tz6024yAtbWGvLPg4EA&oe=6AD4AC22",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "838191045476737",
+          "name": "Tài khoản Google Ai Pro Ultra Antigravity Veo3 Gemini Google One",
+          "url": "https://www.facebook.com/groups/838191045476737",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/116687302_959241714549285_318408173653384421_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s48x48&_nc_cat=1&ccb=1-7&_nc_sid=100df4&_nc_ohc=Ek_B6rF2GbUQ7kNvwFk73R0&_nc_oc=Adp7pNF2qer7Sj-fLdnnTlIA1h-lwVnZ0oUlPMT-Dy_ZiwLMcBfR56seVQQAN5VNoikAQl7iSwxPP6EHAVUu010G&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_ss=7b2a8&oh=00_AQOHew9NfaQICtbIFF2pAFiMxeYiGEH22-dI-MZREgNzWQ&oe=6AF63E03",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "2220843252085081",
+          "name": "Kiếm Tiền Nội Dung 2026",
+          "url": "https://www.facebook.com/groups/2220843252085081",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.99422-6/797905202_3408454269327366_6494522941720716855_n.png?stp=c236.0.608.608a_cp0_dst-jpg_tt6&cstp=mx608x608&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=9E1BqGz-2WkQ7kNvwE-q-di&_nc_oc=Adq0doxBc3bdgBp2-dt81g6g2Idg14iwxJWEwQUDdrHAYTbzOXc5YnRO86rhZDiN4U4iE3hxHhNvYj-w28s2KHMp&_nc_zt=14&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQPN_2BMLHDblEMGsMLOpdMTsziCP15MY1xENoW2gvlyIw&oe=6AD4CC26",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "249668435913050",
+          "name": "Làm Video Bằng AI ✅",
+          "url": "https://www.facebook.com/groups/249668435913050",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/702588962_122112443991288552_3618537872075971720_n.jpg?stp=c453.0.1143.1143a_cp0_dst-jpg_tt6&cstp=mx1143x1143&ctp=s50x50&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=gxboG5ui_GYQ7kNvwFCrLlt&_nc_oc=Adprcs-YiEjYGzjGA-E1YBhrHbR20_tG4XNGZAuEozsx_VBRehk9oB6jtMhXZLiBnd5ETpGAswl7OYI6oneb0Z7D&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQOYUivFD0lo5k-1bRRTvX1o9E7mHXhjM4EpSCMTuZXTLA&oe=6AD4D42F",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "ltdsoftware",
+          "name": "Tool MMO - Code Tool MMO - Share Tool FREE",
+          "url": "https://www.facebook.com/groups/ltdsoftware",
+          "avatar": "https://scontent.fsgn2-9.fna.fbcdn.net/v/t39.30808-6/464176614_1736485360446369_5853479063795367693_n.jpg?stp=c420.0.1080.1080a_cp0_dst-jpg_tt6&cstp=mx1080x1080&ctp=s50x50&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=qv1kt-WvmVsQ7kNvwFG1MiL&_nc_oc=AdqvvAqm4kg1B1yi0Z_FlKpXX4CqEDP5Za6htMcSp6WyE0HjT9et22Ct9E2plARjdXDMB7kuk-l95XozZrbyuTO4&_nc_zt=23&_nc_ht=scontent.fsgn2-9.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQOD3RottNzme85-mnMOc-7ORRjaTqRan8hg3tcs6Lt06w&oe=6AD4B62B",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "3428054237359750",
+          "name": "AI Dễ Ẹc - Kiếm tiền bằng AI - Ông Chú MMO",
+          "url": "https://www.facebook.com/groups/3428054237359750",
+          "avatar": "https://scontent.fsgn2-8.fna.fbcdn.net/v/t39.99422-6/847537063_1807725323477902_4338691740073652128_n.png?stp=c414.0.907.907a_cp0_dst-png&cstp=mx907x907&ctp=s50x50&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=9JI4ClDi0D4Q7kNvwHj-bKQ&_nc_oc=AdqlAVPs5EPqvzhpD0jmJyofZoca_-6R1Fv-lSdg8AC5X43McLgoWgAD9ApjDtrJcJes_jYN82VkyMo4rQJ9aIQw&_nc_zt=14&_nc_ht=scontent.fsgn2-8.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQO-zE90OhScerCotIVptcLdPOZD_lEobqS4amhotaEoVg&oe=6AD4A8BF",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1528487012172019",
+          "name": "Codex VN",
+          "url": "https://www.facebook.com/groups/1528487012172019",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/680043721_122110482105207853_5108622733676583045_n.png?stp=c460.0.433.433a_cp0_dst-png&cstp=mx433x433&ctp=s50x50&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=DR4w55kUhiwQ7kNvwHpehyq&_nc_oc=Adra8If5sGDh3X9VUDZERhCFhFBa1e8pIC3nXq9g-4-OiIBRLa5aM-Qsbf3PBs30VvjY0j36IdHWWHKP4IPq5Bx0&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=nSpgl5MyG-nG5DOUzqjwnw&_nc_ss=7b2a8&oh=00_AQMmQ2xKkVu2rC5Ua8qscmWMV5J9kXdzTGtqYRmkEQA2Ww&oe=6AD4AE6B",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "tiktok.uni",
+          "name": "Nhóm tiktok.uni",
+          "url": "https://www.facebook.com/groups/tiktok.uni",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/496000163_2106244136510202_7529426102077229591_n.jpg?stp=c727.0.1446.1446a_cp0_dst-jpg_tt6&cstp=mx1446x1446&ctp=s110x80&_nc_cat=102&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=KTMj8JrNCd0Q7kNvwHq9W5H&_nc_oc=Adq3NwbrDju73L_lAzWuaCBUFan1244QzAPM3RhsOATjC8jTKGwqfYdavj_IwDDk_o_l4aWWlRxT49QJJ2LUUQwy&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQPkEkhCRyGcbgLXXrivBpkDmpf_7SX8FMxsvPGQaOEZYg&oe=6AD4ADE5",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "congdongaitaivietnam",
+          "name": "Nhóm congdongaitaivietnam",
+          "url": "https://www.facebook.com/groups/congdongaitaivietnam",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/841318845_2470212470171593_5539255479382069167_n.png?stp=c413.0.907.907a_cp0_dst-png&cstp=mx907x907&ctp=s110x80&_nc_cat=101&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=tviP5fHsjn0Q7kNvwGB65nq&_nc_oc=AdqUxS9uoPh9BqyfjpCXOJ6JkwrCNoAYrr9ZIYTJgbhE81BURUCYIJMgaMWMsgYEP6sZ1KCPpxlQPLUMBfWEtNxB&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQNbHO-m0vfDd-kNOrUWxPZkipNRELkkKfWY1d5M4z7-FA&oe=6AD4B1B9",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1016314487514195",
+          "name": "Nhóm 1016314487514195",
+          "url": "https://www.facebook.com/groups/1016314487514195",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/733448685_2073624059893276_3511515233778867136_n.png?stp=c495.0.1059.1059a_cp0_dst-png&cstp=mx1059x1059&ctp=s110x80&_nc_cat=111&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=jm5ffqk9yf4Q7kNvwHt4LTY&_nc_oc=AdpzaYHBwckPbbJRSABCPrvhJaz4k9EZryOaZAiaIJ1ahx9N8ge9C6hg8xvhpboCAn9Bsbzp5rjqckpTetBwApwY&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQOM6Gs7pggayIJktnq0OyznaB39nNnmtKQLh-IZw3_qBg&oe=6AD4C74D",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "2218973584935975",
+          "name": "Nhóm 2218973584935975",
+          "url": "https://www.facebook.com/groups/2218973584935975",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/658867769_923983683719242_7441257864493124715_n.jpg?stp=c245.0.816.816a_cp0_dst-jpg_tt6&cstp=mx816x816&ctp=s110x80&_nc_cat=104&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=SrAoh6sRxFoQ7kNvwGDwTSH&_nc_oc=Ado40UyBc4AFUYXLN7tokVAfme5ihGPVFbQAYfhBB820_UnBFC8PsrQfY_Jc-njevd-F5oZq4IhGr7bo_zn1XSpN&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQP8YOdh82P0P_F4yfbF_93b8AX-j2Batoj3hnbQNKFp4g&oe=6AD4AD8C",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "aivn.dev",
+          "name": "Nhóm aivn.dev",
+          "url": "https://www.facebook.com/groups/aivn.dev",
+          "avatar": "https://scontent.fsgn2-4.fna.fbcdn.net/v/t39.30808-6/495277878_122126025512797552_9086822406873029273_n.png?stp=c1066.0.1242.1242a_cp0_dst-png&cstp=mx1242x1242&ctp=s110x80&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=_4Y5ve_EOFsQ7kNvwHYVDXB&_nc_oc=Adr3q1z9UzCorAkk_hsHngBnrO4GCSHpkFI1yl7jxCwkh5A-2I1RCGgujHLCXJXH_MZxrecarFuDWV-ixdtZS3gg&_nc_zt=23&_nc_ht=scontent.fsgn2-4.fna&_nc_gid=c_dS0lRGfB08COYhV2IaWg&_nc_ss=7b2a8&oh=00_AQPSCSnjanzq8xFeg5kIv5266BCs7domEJEb6DilG2e6bQ&oe=6AD4AE3F",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "323711705341661",
+          "name": "Nhóm 323711705341661",
+          "url": "https://www.facebook.com/groups/323711705341661",
+          "avatar": "https://scontent.fsgn2-9.fna.fbcdn.net/v/t39.30808-6/636810458_2797209620627408_3652274912975744988_n.jpg?stp=c116.0.346.346a_cp0_dst-jpg_tt6&cstp=mx346x346&ctp=s110x80&_nc_cat=106&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=UvFlEiHrd30Q7kNvwE6o59t&_nc_oc=AdpMHICtns-0fQPymCjIAG7AN3O6OOnmkfHs6UgNQ87lToTcec2NYT7iU8wqLWi3QKx519_-c-y6azVQRoPIP0U9&_nc_zt=23&_nc_ht=scontent.fsgn2-9.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQN3kHQXoLwFGmjvnjmI-KV3PxaUmQLTA7ASJq_3rD2QgQ&oe=6AD4CCFC",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "3074633462608971",
+          "name": "Nhóm 3074633462608971",
+          "url": "https://www.facebook.com/groups/3074633462608971",
+          "avatar": "https://scontent.fsgn2-8.fna.fbcdn.net/v/t39.30808-6/617532987_1428963701934607_6575009168164756778_n.png?stp=c420.0.680.680a_cp0_dst-png&cstp=mx680x680&ctp=s110x80&_nc_cat=108&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=iTz85BvW02kQ7kNvwEXO9V5&_nc_oc=AdrehlCqC2X8zRyNg23oaltlvGENR1_19JV1vgI6VmVWL-YPz-O5lvd6SVat21Jk2Ig7r0WeS6LLPRizG_RfNtlZ&_nc_zt=23&_nc_ht=scontent.fsgn2-8.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQOEOghFOhgv3nfIqjGGS64tQFkgyuo8zLW_ktywC7kNUw&oe=6AD4BD23",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "j2team.community",
+          "name": "Nhóm j2team.community",
+          "url": "https://www.facebook.com/groups/j2team.community",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/440938421_2807808749358446_7856582707174608275_n.jpg?stp=c307.0.466.466a_cp0_dst-jpg_tt6&cstp=mx466x466&ctp=s110x80&_nc_cat=1&ccb=1-7&_nc_sid=33e84f&_nc_ohc=wDPpovNRlCAQ7kNvwEbrBY6&_nc_oc=AdoZcHmug7guAaf8eXqQeF4VDTElGobThVDlnFQJgehzbTPlEdCyEIiZQQN-G4lSwmGShNFJrNXiKC8cJs0Kisth&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQOTxZ9AOD42-uPWZUqDFj4-1LLBjleJmMazhnwjyUYnzg&oe=6AD4D3B0",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "congdonghocaivietnam",
+          "name": "Nhóm congdonghocaivietnam",
+          "url": "https://www.facebook.com/groups/congdonghocaivietnam",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t39.30808-6/469520217_122130515846438704_4041490459480230720_n.jpg?stp=c293.0.375.375a_cp0_dst-jpg_tt6&cstp=mx375x375&ctp=s110x80&_nc_cat=104&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=D5v9Bf4DcTgQ7kNvwH-r_no&_nc_oc=AdqcrQyMdA5iUhbufuoSimngbzrj5bVvPpcaI_pTvwZ4DPSEwAYDDDydsRc-RHtECHe4ceLrJYCYfEhttpLz4j2q&_nc_zt=23&_nc_ht=scontent.fsgn2-3.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQM-ySUt9OKhUzIkdeEz2_ixq9tAM5A5pnvxm7Dppe0pcQ&oe=6AD4C384",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "796463946124503",
+          "name": "Nhóm 796463946124503",
+          "url": "https://www.facebook.com/groups/796463946124503",
+          "avatar": "https://scontent.fsgn2-3.fna.fbcdn.net/v/t1.30497-1/116687302_959241714549285_318408173653384421_n.jpg?stp=cp0_dst-jpg_tt6&cstp=mx384x384&ctp=s80x80&_nc_cat=1&ccb=1-7&_nc_sid=100df4&_nc_ohc=Ek_B6rF2GbUQ7kNvwFk73R0&_nc_oc=Adp7pNF2qer7Sj-fLdnnTlIA1h-lwVnZ0oUlPMT-Dy_ZiwLMcBfR56seVQQAN5VNoikAQl7iSwxPP6EHAVUu010G&_nc_zt=24&_nc_ht=scontent.fsgn2-3.fna&_nc_ss=7b2a8&oh=00_AQOHew9NfaQICtbIFF2pAFiMxeYiGEH22-dI-MZREgNzWQ&oe=6AF63E03",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "1433716684430309",
+          "name": "Nhóm 1433716684430309",
+          "url": "https://www.facebook.com/groups/1433716684430309",
+          "avatar": "https://scontent.fsgn2-4.fna.fbcdn.net/v/t39.30808-6/586774761_10240952018036715_1168078714070189364_n.jpg?stp=c297.0.366.366a_cp0_dst-jpg_tt6&cstp=mx366x366&ctp=s110x80&_nc_cat=100&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=qSFTvgXEM6oQ7kNvwFJc_fa&_nc_oc=Ado0B39cgZ-EXS-xhQ4bW1OHnC2aRksfODpKf4NznIXkdftBJZn46FaPJvzK_aI49FQP2Cis5hq8bVrkLD3J_Q7Q&_nc_zt=23&_nc_ht=scontent.fsgn2-4.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQPF6v33iAo38RkfqrYYthdTs5o_ZJrcE9gVBmMXL52b1Q&oe=6AD4A207",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        },
+        {
+          "id": "hoichiasemagiamgiashopee",
+          "name": "Nhóm hoichiasemagiamgiashopee",
+          "url": "https://www.facebook.com/groups/hoichiasemagiamgiashopee",
+          "avatar": "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/731137688_122115671115280770_1598220757985996356_n.jpg?stp=c313.0.335.335a_cp0_dst-jpg_tt6&cstp=mx335x335&ctp=s110x80&_nc_cat=106&_nc_map=urlgen_bucketless&ccb=1-7&_nc_sid=33e84f&_nc_ohc=02NOZeV0sAMQ7kNvwHaaJXZ&_nc_oc=AdrCElshuBtvJ9ETK_h2cLoquV-YEYK6Q16mvSw0XzzfgzhlcoWvcKFhaN4-QzFH1HH8eKYiEmzwzwlqPXA2l6yP&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=1B9Ufe-K5y-oTPDDRWuHFA&_nc_ss=7b2a8&oh=00_AQNICXLv3t97P_8WCj1y6d1oXfpG6wtm0KpBbI4zDHQ-6Q&oe=6AD4AA9F",
+          "privacy": "Công khai",
+          "members": "Cộng đồng FB"
+        }
+      ],
+      "lastSynced": "2026-10-14T02:28:18.460Z",
       "createdAt": "2026-10-13T16:51:26.130Z"
     }
   ],
