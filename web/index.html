@@ -126,17 +126,74 @@
             </div>
 
             <div class="hub-tabs-nav">
-              <div style="display: flex; gap: 6px; align-items: center;">
-                <button class="hub-tab-btn active" data-subtab="subtab-groups">👥 Nhóm Đã Tham Gia (<span id="activeGroupCountText">0</span>)</button>
+              <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <button class="hub-tab-btn active" data-subtab="subtab-live-browser">🌐 Phiên Trình Duyệt Trực Tiếp</button>
+                <button class="hub-tab-btn" data-subtab="subtab-groups">👥 Nhóm Đã Tham Gia (<span id="activeGroupCountText">0</span>)</button>
                 <button class="hub-tab-btn" data-subtab="subtab-api">🔑 Cấu Hình & API Session</button>
               </div>
-              <div class="view-mode-toggle">
+              <div class="view-mode-toggle" id="hubViewModeToggle" style="display: none;">
                 <button class="view-toggle-btn active" id="btnViewModeCards" title="Xem dạng thẻ">🔲 Thẻ</button>
                 <button class="view-toggle-btn" id="btnViewModeTable" title="Xem dạng bảng">📑 Bảng</button>
               </div>
             </div>
 
-            <div class="hub-tab-body" id="subtab-groups">
+            <!-- SUBTAB 1: PHIÊN TRÌNH DUYỆT TRỰC TIẾP (EMBEDDED BROWSER CHUẨN NHƯ ẢNH MẪU) -->
+            <div class="hub-tab-body" id="subtab-live-browser" style="display: flex; flex-direction: column; gap: 10px;">
+              <!-- BROWSER TOP TOOLBAR -->
+              <div class="glass-card" style="padding: 10px 14px; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 200px;">
+                  <span style="font-size: 16px;">📱</span>
+                  <span style="font-weight: 700; font-size: 13px; color: #fff;" id="embeddedBrowserAccountTitle">Phiên Trình Duyệt: Chưa chọn</span>
+                  <span class="status-pill logged-in" style="font-size: 10px; padding: 2px 7px;" id="embeddedBrowserStatusBadge">● Attached Live</span>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                  <button class="btn btn-secondary btn-sm" id="btnEmbeddedReload" title="Tải lại trang">🔄 Nạp lại</button>
+                  <button class="btn btn-secondary btn-sm" id="btnEmbeddedGoLogin" title="Vào trang đăng nhập FB">🏠 Đăng Nhập FB</button>
+                  <button class="btn btn-cyan btn-sm" id="btnEmbeddedOpenNewTab" title="Mở một tab Facebook mới trên trình duyệt điện thoại">🌐 Mở Tab Mới Trên ĐT</button>
+                  <button class="btn btn-success btn-sm" id="btnEmbeddedSync" style="font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">⚡ Đồng Bộ Session</button>
+                </div>
+              </div>
+
+              <!-- NOTICE -->
+              <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 11.5px; color: #93c5fd; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                <span>💡 <b>Mẹo:</b> Anh chạm/click trực tiếp vào ô bên dưới để bấm nút hoặc chọn mã duyệt 2FA trên màn hình Facebook!</span>
+                <span style="color: var(--text-muted); font-size: 11px;">Tự động cập nhật mỗi 1.5s</span>
+              </div>
+
+              <!-- EMBEDDED BROWSER VIEWPORT CONTAINER (GIỐNG ẢNH MẪU CỦA ANH) -->
+              <div class="embedded-browser-container" style="background: #000; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; align-items: center; position: relative; min-height: 480px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);">
+                <!-- SCREEN WRAPPER -->
+                <div id="embeddedScreenWrapper" style="position: relative; width: 100%; max-width: 480px; height: 520px; display: flex; align-items: center; justify-content: center; cursor: crosshair; touch-action: none;">
+                  <img id="imgEmbeddedScreen" src="" alt="Facebook Screen" style="width: 100%; height: 100%; object-fit: contain; display: none; user-select: none; -webkit-user-drag: none;">
+                  <div id="embeddedScreenLoading" style="position: absolute; color: var(--accent-cyan); font-size: 13px; font-weight: 600; background: rgba(15, 23, 42, 0.85); padding: 10px 20px; border-radius: 20px; border: 1px solid var(--border-subtle); text-align: center;">
+                    ⏳ Đang kết nối phiên trình duyệt của tài khoản...
+                  </div>
+                  <div id="embeddedClickRipple" style="position: absolute; width: 28px; height: 28px; border: 2px solid #38bdf8; background: rgba(56, 189, 248, 0.4); border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%) scale(0); transition: transform 0.3s ease-out, opacity 0.3s ease-out; opacity: 0;"></div>
+                </div>
+
+                <!-- QUICK INPUT TOOLBAR -->
+                <div style="width: 100%; padding: 8px 12px; background: rgba(15, 23, 42, 0.95); border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 6px;">
+                  <div style="display: flex; gap: 6px;">
+                    <input type="text" class="form-control" id="inputEmbeddedType" placeholder="Nhập Email / Mật khẩu / Mã 2FA rồi bấm Gửi..." style="flex: 1; font-size: 12.5px; padding: 7px 12px;">
+                    <button class="btn btn-cyan" id="btnEmbeddedSendText" style="padding: 7px 14px; font-size: 12px; font-weight: 600;">Gửi ↵</button>
+                  </div>
+                  <div style="display: flex; gap: 6px; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 4px;">
+                      <button class="btn btn-secondary btn-sm" id="btnEmbeddedEnter">↵ Enter</button>
+                      <button class="btn btn-secondary btn-sm" id="btnEmbeddedBackspace">⌫ Xóa</button>
+                      <button class="btn btn-secondary btn-sm" id="btnEmbeddedScrollDown">⬇ Cuộn xuống</button>
+                      <button class="btn btn-secondary btn-sm" id="btnEmbeddedScrollUp">⬆ Cuộn lên</button>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="btnEmbeddedFinishSync" style="font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                      🎉 ĐÃ DUYỆT XONG - ĐỒNG BỘ NGAY
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBTAB 2: NHÓM ĐÃ THAM GIA -->
+            <div class="hub-tab-body" id="subtab-groups" style="display: none;">
               <div class="groups-toolbar">
                 <div class="search-box">
                   <input type="text" id="inputSearchGroups" placeholder="Tìm kiếm nhóm theo tên hoặc ID nhóm...">
@@ -227,13 +284,13 @@
 
             <div style="display: flex; flex-direction: column; gap: 8px;">
               <button class="btn btn-primary btn-full" id="btnInspectorPhoneLogin" style="font-weight: 700; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);">
-                <span>📱 Đăng Nhập Trên Điện Thoại</span>
+                <span>📱 Mở Trình Duyệt Trực Tiếp</span>
               </button>
               <button class="btn btn-cyan btn-full" id="btnInspectorSync">
                 <span>⚡ Quét Nhóm Đã Tham Gia</span>
               </button>
-              <button class="btn btn-secondary btn-full" id="btnInspectorLiveScreen">
-                <span>👁️ Xem Màn Hình Trình Duyệt</span>
+              <button class="btn btn-secondary btn-full" id="btnInspectorOpenNewTab">
+                <span>🌐 Mở Tab Facebook Trên ĐT</span>
               </button>
             </div>
 

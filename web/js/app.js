@@ -428,6 +428,10 @@ window.selectHubProfile = function(profileId) {
   renderPlatformRibbon();
   renderInspector();
   renderHubGroups();
+  const activeSubtab = document.querySelector('.hub-tab-btn.active')?.getAttribute('data-subtab');
+  if (activeSubtab === 'subtab-live-browser') {
+    startEmbeddedBrowser(profileId);
+  }
 };
 
 function renderInspector() {
@@ -562,6 +566,67 @@ function renderHubGroups() {
   }).join('');
 }
 
+// === PHIÊN TRÌNH DUYỆT TRỰC TIẾP NHÚNG TRÊN MÀN HÌNH CHÍNH (EMBEDDED BROWSER) ===
+let embeddedStreamTimer = null;
+let isEmbeddedStreaming = false;
+
+window.startEmbeddedBrowser = async (profileId) => {
+  if (!profileId) return;
+  const p = currentProfiles.find(item => item.id === profileId);
+  const titleEl = document.getElementById('embeddedBrowserAccountTitle');
+  const img = document.getElementById('imgEmbeddedScreen');
+  const loading = document.getElementById('embeddedScreenLoading');
+
+  if (titleEl) titleEl.textContent = `Phiên Trình Duyệt: ${p ? p.name : ''}`;
+  if (loading) {
+    loading.style.display = 'block';
+    loading.textContent = `⏳ Đang kết nối phiên trình duyệt cho [${p ? p.name : ''}]...`;
+  }
+  if (img) img.style.display = 'none';
+
+  try {
+    await window.electronAPI.startInteractiveBrowser(profileId, { url: 'https://m.facebook.com/login.php', isMobile: true });
+    isEmbeddedStreaming = true;
+    startEmbeddedStream(profileId);
+  } catch (err) {
+    if (loading) loading.textContent = 'Lỗi kết nối: ' + err.message;
+  }
+};
+
+function startEmbeddedStream(profileId) {
+  if (embeddedStreamTimer) clearInterval(embeddedStreamTimer);
+
+  const fetchFrame = () => {
+    if (!isEmbeddedStreaming || !selectedProfileId) return;
+    const img = document.getElementById('imgEmbeddedScreen');
+    const loading = document.getElementById('embeddedScreenLoading');
+
+    const timestamp = Date.now();
+    const url = `/api/profiles/${profileId}/screenshot?t=${timestamp}`;
+    const nextImg = new Image();
+    nextImg.onload = () => {
+      if (!isEmbeddedStreaming) return;
+      if (img) {
+        img.src = url;
+        img.style.display = 'block';
+      }
+      if (loading) loading.style.display = 'none';
+    };
+    nextImg.src = url;
+  };
+
+  fetchFrame();
+  embeddedStreamTimer = setInterval(fetchFrame, 1800);
+}
+
+function stopEmbeddedStream() {
+  isEmbeddedStreaming = false;
+  if (embeddedStreamTimer) {
+    clearInterval(embeddedStreamTimer);
+    embeddedStreamTimer = null;
+  }
+}
+
 function setupHubControls() {
   // Toggle View Mode
   document.getElementById('btnViewModeCards')?.addEventListener('click', () => {
@@ -585,9 +650,180 @@ function setupHubControls() {
       subtabBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const target = btn.getAttribute('data-subtab');
+      document.getElementById('subtab-live-browser').style.display = target === 'subtab-live-browser' ? 'flex' : 'none';
       document.getElementById('subtab-groups').style.display = target === 'subtab-groups' ? 'flex' : 'none';
       document.getElementById('subtab-api').style.display = target === 'subtab-api' ? 'block' : 'none';
+
+      const viewToggle = document.getElementById('hubViewModeToggle');
+      if (viewToggle) {
+        viewToggle.style.display = target === 'subtab-groups' ? 'flex' : 'none';
+      }
+
+      if (target === 'subtab-live-browser' && selectedProfileId) {
+        startEmbeddedBrowser(selectedProfileId);
+      } else {
+        stopEmbeddedStream();
+      }
     });
+  });
+
+  // Embedded Browser Controls
+  document.getElementById('btnEmbeddedReload')?.addEventListener('click', () => {
+    if (selectedProfileId) {
+      const img = document.getElementById('imgEmbeddedScreen');
+      const timestamp = Date.now();
+      if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+    }
+  });
+
+  document.getElementById('btnEmbeddedGoLogin')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    try {
+      await window.electronAPI.startInteractiveBrowser(selectedProfileId, { url: 'https://m.facebook.com/login.php', isMobile: true });
+      setTimeout(() => {
+        const timestamp = Date.now();
+        const img = document.getElementById('imgEmbeddedScreen');
+        if (img) img.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+      }, 1200);
+    } catch (e) {
+      alert(e.message);
+    }
+  });
+
+  const handleOpenNewFbTab = () => {
+    window.open('https://m.facebook.com', '_blank');
+    if (selectedProfileId) {
+      openBookmarkletModal(selectedProfileId);
+    }
+  };
+  document.getElementById('btnEmbeddedOpenNewTab')?.addEventListener('click', handleOpenNewFbTab);
+  document.getElementById('btnInspectorOpenNewTab')?.addEventListener('click', handleOpenNewFbTab);
+
+  const handleFinishEmbeddedSync = async () => {
+    if (!selectedProfileId) return;
+    const btn = document.getElementById('btnEmbeddedFinishSync');
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = '⏳ Đang đồng bộ...';
+    }
+    try {
+      appendLog({ time: new Date().toLocaleTimeString('vi-VN'), message: `Đang trích xuất UID, Tên, Avatar và Cookie...`, type: 'info' });
+      const res = await window.electronAPI.fetchApiSession(selectedProfileId);
+      if (res.success && res.isLoggedIn) {
+        alert(`🎉 ĐỒNG BỘ THÀNH CÔNG!\nChào mừng ${res.name || 'Facebook'} (UID: ${res.uid || ''})`);
+        await loadProfiles();
+        const groupsTab = document.querySelector('[data-subtab="subtab-groups"]');
+        if (groupsTab) groupsTab.click();
+      } else {
+        alert('⚠️ Chưa phát hiện phiên đăng nhập Facebook hoàn tất. Anh hãy kiểm tra xem màn hình đã vào Bảng tin chưa nhé!\n\nChi tiết: ' + (res.message || ''));
+      }
+    } catch (err) {
+      alert('Lỗi: ' + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🎉 ĐÃ DUYỆT XONG - ĐỒNG BỘ NGAY';
+      }
+    }
+  };
+  document.getElementById('btnEmbeddedSync')?.addEventListener('click', handleFinishEmbeddedSync);
+  document.getElementById('btnEmbeddedFinishSync')?.addEventListener('click', handleFinishEmbeddedSync);
+
+  // Chạm vào màn hình để gửi click
+  const embWrapper = document.getElementById('embeddedScreenWrapper');
+  const embImg = document.getElementById('imgEmbeddedScreen');
+  const embRipple = document.getElementById('embeddedClickRipple');
+
+  if (embWrapper && embImg) {
+    const handleEmbClick = async (e) => {
+      if (!selectedProfileId || !isEmbeddedStreaming) return;
+      const rect = embImg.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+        return;
+      }
+
+      const xPercent = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+      const yPercent = Math.max(0, Math.min(100, ((clientY - rect.top) / rect.height) * 100));
+
+      if (embRipple) {
+        embRipple.style.left = `${clientX - rect.left + embImg.offsetLeft}px`;
+        embRipple.style.top = `${clientY - rect.top + embImg.offsetTop}px`;
+        embRipple.style.opacity = '1';
+        embRipple.style.transform = 'translate(-50%, -50%) scale(1.5)';
+        setTimeout(() => {
+          embRipple.style.opacity = '0';
+          embRipple.style.transform = 'translate(-50%, -50%) scale(0)';
+        }, 300);
+      }
+
+      try {
+        await window.electronAPI.interactClick(selectedProfileId, { xPercent, yPercent });
+        setTimeout(() => {
+          const timestamp = Date.now();
+          embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+        }, 700);
+      } catch (err) {
+        console.error('[Touch Error]', err);
+      }
+    };
+
+    embWrapper.addEventListener('click', handleEmbClick);
+  }
+
+  // Gửi chữ vào ô nhập
+  const sendEmbText = async () => {
+    const input = document.getElementById('inputEmbeddedType');
+    if (!input || !selectedProfileId) return;
+    const text = input.value;
+    if (!text) return;
+    input.value = '';
+    try {
+      await window.electronAPI.interactType(selectedProfileId, { text, pressEnter: false });
+      setTimeout(() => {
+        const timestamp = Date.now();
+        if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+      }, 600);
+    } catch (err) {
+      alert('Lỗi gõ chữ: ' + err.message);
+    }
+  };
+
+  document.getElementById('btnEmbeddedSendText')?.addEventListener('click', sendEmbText);
+  document.getElementById('inputEmbeddedType')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') sendEmbText();
+  });
+  document.getElementById('btnEmbeddedEnter')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    await window.electronAPI.interactKey(selectedProfileId, { key: 'Enter' });
+    setTimeout(() => {
+      const timestamp = Date.now();
+      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+    }, 700);
+  });
+  document.getElementById('btnEmbeddedBackspace')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    await window.electronAPI.interactKey(selectedProfileId, { key: 'Backspace' });
+  });
+  document.getElementById('btnEmbeddedScrollDown')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    await window.electronAPI.interactScroll(selectedProfileId, { deltaY: 350 });
+    setTimeout(() => {
+      const timestamp = Date.now();
+      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+    }, 500);
+  });
+  document.getElementById('btnEmbeddedScrollUp')?.addEventListener('click', async () => {
+    if (!selectedProfileId) return;
+    await window.electronAPI.interactScroll(selectedProfileId, { deltaY: -350 });
+    setTimeout(() => {
+      const timestamp = Date.now();
+      if (embImg) embImg.src = `/api/profiles/${selectedProfileId}/screenshot?t=${timestamp}`;
+    }, 500);
   });
 
   // Search input
